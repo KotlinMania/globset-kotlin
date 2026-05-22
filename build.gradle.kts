@@ -28,7 +28,7 @@ plugins {
 }
 
 group = "io.github.kotlinmania"
-version = "0.1.0"
+version = "0.1.1"
 
 val androidCommandLineToolsRevision = "14742923"
 val projectCompileSdk = "34"
@@ -535,16 +535,31 @@ tasks.register("setupAndroidSdk") {
 tasks.register("test") {
     group = "verification"
     description =
-        "Runs the host-portable test suite (macOS + JS + WasmJS + Android unit). " +
-        "Non-host native targets (mingwX64, linuxX64) only run on their own host."
+        "Runs every test target that can execute on this macOS host: JVM, " +
+        "JS (browser + Node), Wasm-JS (browser + Node), Wasm-WASI (Node), " +
+        "Android host unit, macOS-arm64 native, and the Apple simulators " +
+        "(iOS, tvOS, watchOS). Non-host native targets (linuxX64, " +
+        "linuxArm64, mingwX64) run on their own platform workflows in CI; " +
+        "the Apple device targets (iosArm64, tvosArm64, watchosArm32/Arm64/" +
+        "DeviceArm64) are linked by `build` but only execute on real " +
+        "hardware via CI."
 
     val defaultTestTasks = listOf(
-        "macosArm64Test",
+        // JVM + Android host JVM
         "jvmTest",
+        "testAndroidHostTest",
+        // JS + Wasm-JS + Wasm-WASI
+        "jsBrowserTest",
         "jsNodeTest",
+        "wasmJsBrowserTest",
         "wasmJsNodeTest",
-        "compileAndroidMain",
-        "assembleUnitTest",
+        "wasmWasiNodeTest",
+        // macOS native + Apple simulators (runnable on macOS host)
+        "macosArm64Test",
+        "iosSimulatorArm64Test",
+        "iosX64Test",
+        "tvosSimulatorArm64Test",
+        "watchosSimulatorArm64Test",
     )
 
     dependsOn(defaultTestTasks.mapNotNull { taskName -> tasks.findByName(taskName) })
@@ -629,21 +644,33 @@ tasks.matching { it.name == "embedSwiftExportForXcode" }.configureEach {
     }
 }
 
-val fullTargetBuildTaskNames = setOf(
+val fullTargetBuildTasks = listOf(
     "compileAndroidMain",
     "compileAndroidHostTest",
     "compileAndroidDeviceTest",
     "assembleAndroidMain",
+    "assembleAndroidHostTest",
+    "assembleAndroidDeviceTest",
     "assembleUnitTest",
     "assembleAndroidTest",
+    "testAndroidHostTest",
     "jvmMainClasses",
     "jvmTestClasses",
+    "jvmTest",
     "jsMainClasses",
     "jsTestClasses",
+    "jsBrowserTest",
+    "jsNodeTest",
+    "jsTest",
     "wasmJsMainClasses",
     "wasmJsTestClasses",
+    "wasmJsBrowserTest",
+    "wasmJsNodeTest",
+    "wasmJsTest",
     "wasmWasiMainClasses",
     "wasmWasiTestClasses",
+    "wasmWasiNodeTest",
+    "wasmWasiTest",
     "androidNativeArm32Binaries",
     "androidNativeArm32TestBinaries",
     "androidNativeArm64Binaries",
@@ -662,10 +689,13 @@ val fullTargetBuildTaskNames = setOf(
     "linuxArm64TestBinaries",
     "linuxX64Binaries",
     "linuxX64TestBinaries",
+    "linuxX64Test",
     "macosArm64Binaries",
     "macosArm64TestBinaries",
+    "macosArm64Test",
     "mingwX64Binaries",
     "mingwX64TestBinaries",
+    "mingwX64Test",
     "tvosArm64Binaries",
     "tvosArm64TestBinaries",
     "tvosSimulatorArm64Binaries",
@@ -678,11 +708,74 @@ val fullTargetBuildTaskNames = setOf(
     "watchosDeviceArm64TestBinaries",
     "watchosSimulatorArm64Binaries",
     "watchosSimulatorArm64TestBinaries",
+    "embedSwiftExportForXcode",
     "assembleGlobsetXCFramework",
+    "assembleGlobsetDebugXCFramework",
+    "assembleGlobsetReleaseXCFramework",
+    "assembleDebugIosFatFrameworkForGlobsetXCFramework",
+    "assembleReleaseIosFatFrameworkForGlobsetXCFramework",
+    "assembleDebugIosSimulatorFatFrameworkForGlobsetXCFramework",
+    "assembleReleaseIosSimulatorFatFrameworkForGlobsetXCFramework",
+    "assembleDebugMacosFatFrameworkForGlobsetXCFramework",
+    "assembleReleaseMacosFatFrameworkForGlobsetXCFramework",
+    "assembleDebugTvosFatFrameworkForGlobsetXCFramework",
+    "assembleReleaseTvosFatFrameworkForGlobsetXCFramework",
+    "assembleDebugTvosSimulatorFatFrameworkForGlobsetXCFramework",
+    "assembleReleaseTvosSimulatorFatFrameworkForGlobsetXCFramework",
+    "assembleDebugWatchosFatFrameworkForGlobsetXCFramework",
+    "assembleReleaseWatchosFatFrameworkForGlobsetXCFramework",
+    "assembleDebugWatchosSimulatorFatFrameworkForGlobsetXCFramework",
+    "assembleReleaseWatchosSimulatorFatFrameworkForGlobsetXCFramework",
+    "exportCommonSourceSetsMetadataLocationsForMetadataApiElements",
+    "exportRootPublicationCoordinatesForMetadataApiElements",
+    "exportCrossCompilationMetadataForAndroidNativeArm32ApiElements",
+    "exportCrossCompilationMetadataForAndroidNativeArm64ApiElements",
+    "exportCrossCompilationMetadataForAndroidNativeX64ApiElements",
+    "exportCrossCompilationMetadataForAndroidNativeX86ApiElements",
+    "exportCrossCompilationMetadataForIosArm64ApiElements",
+    "exportCrossCompilationMetadataForIosSimulatorArm64ApiElements",
+    "exportCrossCompilationMetadataForIosX64ApiElements",
+    "exportCrossCompilationMetadataForLinuxArm64ApiElements",
+    "exportCrossCompilationMetadataForLinuxX64ApiElements",
+    "exportCrossCompilationMetadataForMacosArm64ApiElements",
+    "exportCrossCompilationMetadataForMingwX64ApiElements",
+    "exportCrossCompilationMetadataForTvosArm64ApiElements",
+    "exportCrossCompilationMetadataForTvosSimulatorArm64ApiElements",
+    "exportCrossCompilationMetadataForWatchosArm32ApiElements",
+    "exportCrossCompilationMetadataForWatchosArm64ApiElements",
+    "exportCrossCompilationMetadataForWatchosDeviceArm64ApiElements",
+    "exportCrossCompilationMetadataForWatchosSimulatorArm64ApiElements",
+    "exportTargetPublicationCoordinatesForAndroidApiElements",
+    "exportTargetPublicationCoordinatesForAndroidNativeArm32ApiElements",
+    "exportTargetPublicationCoordinatesForAndroidNativeArm64ApiElements",
+    "exportTargetPublicationCoordinatesForAndroidNativeX64ApiElements",
+    "exportTargetPublicationCoordinatesForAndroidNativeX86ApiElements",
+    "exportTargetPublicationCoordinatesForAndroidRuntimeElements",
+    "exportTargetPublicationCoordinatesForIosArm64ApiElements",
+    "exportTargetPublicationCoordinatesForIosSimulatorArm64ApiElements",
+    "exportTargetPublicationCoordinatesForIosX64ApiElements",
+    "exportTargetPublicationCoordinatesForJsApiElements",
+    "exportTargetPublicationCoordinatesForJsRuntimeElements",
+    "exportTargetPublicationCoordinatesForJvmApiElements",
+    "exportTargetPublicationCoordinatesForJvmRuntimeElements",
+    "exportTargetPublicationCoordinatesForLinuxArm64ApiElements",
+    "exportTargetPublicationCoordinatesForLinuxX64ApiElements",
+    "exportTargetPublicationCoordinatesForMacosArm64ApiElements",
+    "exportTargetPublicationCoordinatesForMingwX64ApiElements",
+    "exportTargetPublicationCoordinatesForTvosArm64ApiElements",
+    "exportTargetPublicationCoordinatesForTvosSimulatorArm64ApiElements",
+    "exportTargetPublicationCoordinatesForWasmJsApiElements",
+    "exportTargetPublicationCoordinatesForWasmJsRuntimeElements",
+    "exportTargetPublicationCoordinatesForWasmWasiApiElements",
+    "exportTargetPublicationCoordinatesForWasmWasiRuntimeElements",
+    "exportTargetPublicationCoordinatesForWatchosArm32ApiElements",
+    "exportTargetPublicationCoordinatesForWatchosArm64ApiElements",
+    "exportTargetPublicationCoordinatesForWatchosDeviceArm64ApiElements",
+    "exportTargetPublicationCoordinatesForWatchosSimulatorArm64ApiElements",
 )
 
 tasks.named("build") {
-    dependsOn(fullTargetBuildTaskNames)
+    dependsOn(fullTargetBuildTasks)
 }
 
 afterEvaluate {
@@ -692,7 +785,12 @@ afterEvaluate {
                 name.endsWith("MainClasses") ||
                     name.endsWith("TestClasses") ||
                     name.endsWith("Binaries") ||
-                    name.endsWith("XCFramework")
+                    name.endsWith("XCFramework") ||
+                    name == "embedSwiftExportForXcode" ||
+                    name.startsWith("exportCommonSourceSetsMetadataLocationsFor") ||
+                    name.startsWith("exportRootPublicationCoordinatesFor") ||
+                    name.startsWith("exportCrossCompilationMetadataFor") ||
+                    name.startsWith("exportTargetPublicationCoordinatesFor")
             },
         )
     }
