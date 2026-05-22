@@ -13,6 +13,8 @@ package io.github.kotlinmania.globset
  * Items parceled out of `src/lib.rs`:
  *   - `Error` struct          -> Error.kt
  *   - `ErrorKind` enum        -> Error.kt
+ *   - `escape` function       -> Escape.kt
+ *   - `mod tests::escape`     -> EscapeTests.kt
  *
  * Items still pending port (blocked on `src/glob.rs`, which is itself
  * blocked on `regex-automata-kotlin` / `aho-corasick-kotlin` / `bstr-kotlin`
@@ -32,6 +34,5 @@ package io.github.kotlinmania.globset
  *   - `RegexSetStrategy`      struct
  *   - `MultiStrategyBuilder`  struct
  *   - `RequiredExtensionStrategyBuilder` struct
- *   - `escape`                function
- *   - lib.rs `mod tests`      (all tests require Glob/GlobSetBuilder)
+ *   - remaining `mod tests`   (require Glob / GlobSet / GlobSetBuilder)
  */
