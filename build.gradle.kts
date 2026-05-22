@@ -425,6 +425,48 @@ tasks.register("test") {
     dependsOn(defaultTestTasks.mapNotNull { taskName -> tasks.findByName(taskName) })
 }
 
+// Force the JS / Wasm compile + test tasks to regenerate the yarn lockfile
+// before they run, so kotlinStoreYarnLock sees the up-to-date result of the
+// `YarnRootExtension` resolutions configured above. Without this wiring, CI
+// fails with `Lock file was changed. Run the `kotlinUpgradeYarnLock` task to
+// actualize lock file` whenever a transitive resolution drift changes the
+// generated lock. Pattern copied verbatim from syn-kotlin.
+val jsYarnLockBuildTasks = listOf(
+    "compileKotlinJs",
+    "compileTestKotlinJs",
+    "jsMainClasses",
+    "jsTestClasses",
+    "jsJar",
+    "jsTest",
+)
+
+jsYarnLockBuildTasks.forEach { taskName ->
+    tasks.named(taskName) {
+        dependsOn("kotlinUpgradeYarnLock")
+    }
+}
+
+val wasmYarnLockBuildTasks = listOf(
+    "compileKotlinWasmJs",
+    "compileTestKotlinWasmJs",
+    "wasmJsMainClasses",
+    "wasmJsTestClasses",
+    "wasmJsJar",
+    "wasmJsTest",
+    "compileKotlinWasmWasi",
+    "compileTestKotlinWasmWasi",
+    "wasmWasiMainClasses",
+    "wasmWasiTestClasses",
+    "wasmWasiJar",
+    "wasmWasiTest",
+)
+
+wasmYarnLockBuildTasks.forEach { taskName ->
+    tasks.named(taskName) {
+        dependsOn("kotlinWasmUpgradeYarnLock")
+    }
+}
+
 val fullTargetBuildTaskNames = setOf(
     "compileAndroidMain",
     "compileAndroidHostTest",
