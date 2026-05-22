@@ -34,9 +34,9 @@ name: "CodeQL Advanced"
 
 on:
   schedule:
-    - cron: "0 7 * * 1"
-  workflow_dispatch:
+    - cron: '44 16 * * 0'
 
+  workflow_dispatch:
 permissions:
   contents: read
 
