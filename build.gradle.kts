@@ -51,6 +51,21 @@ val androidSdkManager = projectAndroidSdkDir.resolve(
 )
 val androidSdkInstallMarker = projectAndroidSdkDir.resolve(".install-complete")
 
+// RUNBOOK 2026-05-19 §"Android SDK setup" step 6: the .install-complete
+// marker alone is not enough — the cached path must also verify that the
+// required SDK packages still exist. If the marker is stale or sdkmanager
+// silently lost a package, fall through and re-run the installer.
+val requiredAndroidSdkPackageDirs = listOf(
+    projectAndroidSdkDir.resolve("platform-tools"),
+    projectAndroidSdkDir.resolve("platforms/android-$projectCompileSdk"),
+    projectAndroidSdkDir.resolve("build-tools/$projectAndroidBuildTools"),
+)
+
+fun isProjectAndroidSdkInstalled(): Boolean =
+    androidSdkInstallMarker.exists() &&
+        androidSdkManager.exists() &&
+        requiredAndroidSdkPackageDirs.all { it.exists() }
+
 fun writeAndroidLocalProperties() {
     val sdkDirPropertyValue = projectAndroidSdkDir.absolutePath.replace("\\", "/")
     layout.projectDirectory.file("local.properties").asFile.writeText("sdk.dir=$sdkDirPropertyValue\n")
@@ -114,7 +129,7 @@ fun downloadAndroidCommandLineTools() {
 }
 
 fun installProjectAndroidSdk(execOperations: ExecOperations) {
-    if (androidSdkInstallMarker.exists() && androidSdkManager.exists()) {
+    if (isProjectAndroidSdkInstalled()) {
         writeAndroidLocalProperties()
         println("setup-android-sdk: SDK already installed at $projectAndroidSdkDir")
         return
@@ -399,6 +414,116 @@ mavenPublishing {
     }
 }
 
+// ---------------------------------------------------------------------------
+// CodeQL Java/Kotlin extraction task
+//
+// .github/workflows/codeql.yml invokes `./gradlew codeqlCompileJvm` to feed
+// kotlinc-compiled commonMain through the CodeQL Java agent. Pattern copied
+// from syn-kotlin. globset has no Android AAR sibling dependencies yet, so
+// codeqlAndroidAar is intentionally empty.
+val codeqlKotlinc: Configuration by configurations.creating {
+    description = "Kotlin compiler (CodeQL extraction target only — not published)"
+    isCanBeResolved = true
+    isCanBeConsumed = false
+}
+
+val codeqlSourceClasspath: Configuration by configurations.creating {
+    description = "Runtime classpath for CodeQL extraction of commonMain sources"
+    isCanBeResolved = true
+    isCanBeConsumed = false
+}
+
+val codeqlAndroidAar: Configuration by configurations.creating {
+    description = "Android AAR artifacts for CodeQL classpath extraction (classes.jar only)"
+    isCanBeResolved = true
+    isCanBeConsumed = false
+}
+
+dependencies {
+    codeqlKotlinc("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.3.21")
+    codeqlSourceClasspath("org.jetbrains.kotlin:kotlin-stdlib:2.3.21")
+    codeqlSourceClasspath("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.11.0")
+    codeqlSourceClasspath("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.11.0")
+    codeqlSourceClasspath("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.11.0")
+    codeqlSourceClasspath("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.8.0")
+    codeqlSourceClasspath("org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.4.0")
+}
+
+val codeqlCompileJvm = tasks.register<JavaExec>("codeqlCompileJvm") {
+    description =
+        "Compile commonMain Kotlin sources with kotlinc 2.3.21 for CodeQL Java/Kotlin extraction."
+    group = "verification"
+
+    classpath(codeqlKotlinc)
+    mainClass.set("org.jetbrains.kotlin.cli.jvm.K2JVMCompiler")
+
+    val outDir = layout.buildDirectory.dir("classes/kotlin/codeql-jvm")
+    val aarExtractDir = layout.buildDirectory.dir("codeql/android-aar")
+    val commonSources = fileTree("src/commonMain/kotlin") { include("**/*.kt") }
+    val platformSources = fileTree("src/androidMain/kotlin") { include("**/*.kt") }
+    val sources = files(commonSources, platformSources)
+    val sentinelDir = layout.buildDirectory.dir("generated/codeql-empty-source")
+    inputs.files(sources).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.files(codeqlSourceClasspath).withNormalizer(ClasspathNormalizer::class.java)
+    inputs.files(codeqlAndroidAar).withNormalizer(ClasspathNormalizer::class.java)
+    outputs.dir(outDir)
+    outputs.dir(aarExtractDir)
+    outputs.dir(sentinelDir)
+
+    doFirst {
+        outDir.get().asFile.mkdirs()
+        val extractedJars = mutableListOf<File>()
+        for (aar in codeqlAndroidAar.resolve()) {
+            val extractTarget = aarExtractDir.get().asFile.resolve(aar.nameWithoutExtension)
+            extractTarget.mkdirs()
+            copy {
+                from(zipTree(aar))
+                include("classes.jar")
+                into(extractTarget)
+            }
+            val classesJar = extractTarget.resolve("classes.jar")
+            if (classesJar.exists()) {
+                extractedJars += classesJar
+            }
+        }
+        val fullClasspath =
+            (codeqlSourceClasspath.resolve() + extractedJars)
+                .joinToString(File.pathSeparator) { it.absolutePath }
+        val commonSourceFiles = commonSources.files.toMutableList()
+        val sourceFiles = sources.files.toMutableList()
+        if (sourceFiles.isEmpty()) {
+            val sentinelFile = sentinelDir.get().asFile.resolve("io/github/kotlinmania/codeql/_CodeqlEmptySource.kt")
+            sentinelFile.parentFile.mkdirs()
+            sentinelFile.writeText(
+                """
+                // Auto-generated. Present so codeqlCompileJvm has at least
+                // one Kotlin source to feed kotlinc; replaced by real
+                // commonMain content once porting begins.
+                package io.github.kotlinmania.globset.codeql
+
+                private object _CodeqlEmptySource
+                """.trimIndent(),
+            )
+            commonSourceFiles += sentinelFile
+            sourceFiles += sentinelFile
+        }
+        args = listOf(
+            "-d", outDir.get().asFile.absolutePath,
+            "-classpath", fullClasspath,
+            "-jvm-target", "21",
+            "-no-stdlib",
+            "-no-reflect",
+            "-language-version", "2.3",
+            "-api-version", "2.3",
+            "-Xmulti-platform",
+            "-Xcommon-sources=${commonSourceFiles.joinToString(",") { it.absolutePath }}",
+            "-Xexpect-actual-classes",
+            "-opt-in", "kotlin.time.ExperimentalTime",
+            "-opt-in", "kotlin.concurrent.atomics.ExperimentalAtomicApi",
+        ) + sourceFiles.map { it.absolutePath }
+    }
+}
+
 tasks.register("setupAndroidSdk") {
     group = "setup"
     description = "Downloads and configures the project-local Android SDK."
@@ -423,6 +548,85 @@ tasks.register("test") {
     )
 
     dependsOn(defaultTestTasks.mapNotNull { taskName -> tasks.findByName(taskName) })
+}
+
+// Force the JS / Wasm compile + test tasks to regenerate the yarn lockfile
+// before they run, so kotlinStoreYarnLock sees the up-to-date result of the
+// `YarnRootExtension` resolutions configured above. Without this wiring, CI
+// fails with `Lock file was changed. Run the `kotlinUpgradeYarnLock` task to
+// actualize lock file` whenever a transitive resolution drift changes the
+// generated lock. Pattern copied verbatim from syn-kotlin.
+val jsYarnLockBuildTasks = listOf(
+    "compileKotlinJs",
+    "compileTestKotlinJs",
+    "jsMainClasses",
+    "jsTestClasses",
+    "jsJar",
+    "jsTest",
+)
+
+jsYarnLockBuildTasks.forEach { taskName ->
+    tasks.named(taskName) {
+        dependsOn("kotlinUpgradeYarnLock")
+    }
+}
+
+val wasmYarnLockBuildTasks = listOf(
+    "compileKotlinWasmJs",
+    "compileTestKotlinWasmJs",
+    "wasmJsMainClasses",
+    "wasmJsTestClasses",
+    "wasmJsJar",
+    "wasmJsTest",
+    "compileKotlinWasmWasi",
+    "compileTestKotlinWasmWasi",
+    "wasmWasiMainClasses",
+    "wasmWasiTestClasses",
+    "wasmWasiJar",
+    "wasmWasiTest",
+)
+
+wasmYarnLockBuildTasks.forEach { taskName ->
+    tasks.named(taskName) {
+        dependsOn("kotlinWasmUpgradeYarnLock")
+    }
+}
+
+// `embedSwiftExportForXcode` only makes sense when Xcode itself invoked
+// Gradle — the task reads SDK_NAME / CONFIGURATION / etc. out of the Xcode
+// environment. Skip it on any other run so `./gradlew build` doesn't fail
+// for developers and CI machines that aren't inside Xcode. Pattern copied
+// from syn-kotlin.
+val xcodeSwiftExportEnvironmentNames = listOf(
+    "SDK_NAME",
+    "CONFIGURATION",
+    "TARGET_BUILD_DIR",
+    "BUILT_PRODUCTS_DIR",
+    "ARCHS",
+    "FRAMEWORKS_FOLDER_PATH",
+    "DEPLOYMENT_TARGET_SETTING_NAME",
+)
+
+fun hasXcodeSwiftExportEnvironment(): Boolean {
+    if (!xcodeSwiftExportEnvironmentNames.all { !System.getenv(it).isNullOrBlank() }) {
+        return false
+    }
+
+    val deploymentTargetSettingName = System.getenv("DEPLOYMENT_TARGET_SETTING_NAME")
+    return !System.getenv(deploymentTargetSettingName).isNullOrBlank()
+}
+
+val swiftExportTaskDirectlyRequested =
+    gradle.startParameter.taskNames.any { it == "embedSwiftExportForXcode" || it.endsWith(":embedSwiftExportForXcode") }
+
+tasks.matching { it.name == "embedSwiftExportForXcode" }.configureEach {
+    onlyIf {
+        val hasXcodeEnvironment = hasXcodeSwiftExportEnvironment()
+        if (!hasXcodeEnvironment && !swiftExportTaskDirectlyRequested) {
+            logger.lifecycle("embedSwiftExportForXcode: skipped because Xcode environment variables are not present")
+        }
+        hasXcodeEnvironment || swiftExportTaskDirectlyRequested
+    }
 }
 
 val fullTargetBuildTaskNames = setOf(
