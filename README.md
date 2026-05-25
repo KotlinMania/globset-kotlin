@@ -475,10 +475,9 @@ ripgrep is written in Rust, so you'll need to grab a
 ripgrep compiles with Rust 1.85.0 (stable) or newer. In general, ripgrep tracks
 the latest stable release of the Rust compiler.
 
-To build ripgrep:
+To build ripgrep from a prepared checkout:
 
 ```
-$ git clone https://github.com/BurntSushi/ripgrep
 $ cd ripgrep
 $ cargo build --release
 $ ./target/release/rg --version
