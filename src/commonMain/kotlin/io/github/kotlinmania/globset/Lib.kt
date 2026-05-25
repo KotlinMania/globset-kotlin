@@ -14,4 +14,6 @@ package io.github.kotlinmania.globset
  *   - `ErrorKind` enum        -> Error.kt
  *   - `escape` function       -> Escape.kt
  *   - `mod tests::escape`     -> EscapeTests.kt
+ *   - `Candidate` struct      -> Candidate.kt
+ *   - `mod tests::Candidate`  -> CandidateTests.kt
  */
