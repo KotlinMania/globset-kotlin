@@ -17,3 +17,5 @@ package io.github.kotlinmania.globset
  *   - `Candidate` struct      -> Candidate.kt
  *   - `mod tests::Candidate`  -> CandidateTests.kt
  */
+
+private const val MODULE_LEDGER = true

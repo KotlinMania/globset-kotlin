@@ -46,13 +46,14 @@ public class Candidate internal constructor(
     internal fun pathSuffix(max: Int): ByteArray =
         if (path.size <= max) path else path.copyOfRange(path.size - max, path.size)
 
-    override fun toString(): String = buildString {
-        append("Candidate(path=")
-        append(path.decodeToString())
-        append(", basename=")
-        append(basename.decodeToString())
-        append(", ext=")
-        append(ext.decodeToString())
-        append(')')
-    }
+    override fun toString(): String =
+        buildString {
+            append("Candidate(path=")
+            append(path.decodeToString())
+            append(", basename=")
+            append(basename.decodeToString())
+            append(", ext=")
+            append(ext.decodeToString())
+            append(')')
+        }
 }

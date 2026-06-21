@@ -5,7 +5,9 @@ package io.github.kotlinmania.globset
 internal typealias HashMap<K, V> = kotlin.collections.HashMap<K, V>
 
 /** A hasher that implements the Fowler–Noll–Vo (FNV) hash. */
-internal class Hasher(private var state: ULong = OFFSET_BASIS) {
+internal class Hasher(
+    private var state: ULong = OFFSET_BASIS,
+) {
     fun finish(): ULong = state
 
     fun write(bytes: ByteArray) {
