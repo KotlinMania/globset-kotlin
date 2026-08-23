@@ -1,4 +1,4 @@
-import XCTest
+import Testing
 import Globset
 
 // Smoke test for the Kotlin → Swift Export → SPM → swift test pipeline.
@@ -28,8 +28,10 @@ import Globset
 // Add more meaningful per-API tests below as the Swift Export surface
 // grows. For now the import + a single passing assertion is the
 // canary that the pipeline is green for this repo.
-final class GlobsetExportTests: XCTestCase {
+@Suite("Globset Swift Export Tests")
+struct GlobsetExportTests {
+    @Test("Swift module loads and exports cleanly")
     func testSwiftModuleLoads() throws {
-        XCTAssertTrue(true, "Globset swift module imported cleanly")
+        #expect(Bool(true), "Globset swift module imported cleanly")
     }
 }
