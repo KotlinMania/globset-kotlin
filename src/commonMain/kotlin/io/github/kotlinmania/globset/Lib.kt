@@ -16,4 +16,3 @@ package io.github.kotlinmania.globset
  * - GlobSet and GlobSetBuilder types are in GlobSet.kt
  */
 private const val MODULE_LEDGER = true
-

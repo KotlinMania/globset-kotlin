@@ -838,4 +838,13 @@ class GlobTests {
     @Test fun extractBaselit3() = assertNull(GlobBuilder.new("*foo").build().basenameLiteral())
 
     @Test fun extractBaselit4() = assertNull(GlobBuilder.new("*/foo").build().basenameLiteral())
+
+    @Test
+    fun testFromStrAndRefs() {
+        val g = Glob.fromStr("src/**/*.kt")
+        assertEquals("src/**/*.kt", g.glob())
+        assertEquals("src/**/*.kt", g.asStr())
+        assertEquals("src/**/*.kt", g.asRef())
+        assertEquals(g, Glob.new("src/**/*.kt"))
+    }
 }
