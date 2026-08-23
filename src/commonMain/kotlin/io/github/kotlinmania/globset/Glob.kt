@@ -1,4 +1,4 @@
-// port-lint: source glob.rs
+// port-lint: source src/glob.rs
 package io.github.kotlinmania.globset
 
 /**
@@ -361,6 +361,16 @@ class Glob internal constructor(
         return lit.toString()
     }
 
+    fun eq(other: Glob): Boolean = this == other
+
+    fun hash(): Int = hashCode()
+
+    fun deref(): String = glob
+
+    fun fmt(builder: StringBuilder) {
+        builder.append("Glob(\"$glob\")")
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Glob) return false
@@ -484,7 +494,7 @@ class GlobBuilder internal constructor(
         val p = Parser(glob, opts)
         p.parse()
         if (p.branches.isEmpty()) {
-            throw IllegalStateException("Parser branches unexpectedly empty")
+            throw IllegalStateException("bug in parser")
         } else if (p.branches.size > 1) {
             throw Error(glob, ErrorKind.UnclosedAlternates)
         } else {
@@ -492,6 +502,10 @@ class GlobBuilder internal constructor(
             val re = tokens.toRegexWith(opts)
             return Glob(glob, re, opts.copy(), tokens)
         }
+    }
+
+    fun fmt(builder: StringBuilder) {
+        builder.append("GlobBuilder(\"$glob\")")
     }
 }
 
@@ -513,6 +527,10 @@ internal class Tokens(
     companion object {
         fun default(): Tokens = Tokens()
     }
+
+    fun deref(): List<Token> = list
+
+    fun derefMut(): MutableList<Token> = list
 
     fun toRegexWith(options: GlobOptions): String {
         val re = StringBuilder()
@@ -937,17 +955,4 @@ internal fun endsWith(needle: ByteArray, haystack: ByteArray): Boolean {
         if (haystack[offset + i] != needle[i]) return false
     }
     return true
-}
-
-internal fun newRegex(pat: String): Regex {
-    var cleaned = pat
-    var options = setOf<RegexOption>()
-    if (cleaned.startsWith("(?-u)")) {
-        cleaned = cleaned.removePrefix("(?-u)")
-    }
-    if (cleaned.startsWith("(?i)")) {
-        cleaned = cleaned.removePrefix("(?i)")
-        options = setOf(RegexOption.IGNORE_CASE)
-    }
-    return Regex(cleaned, options)
 }

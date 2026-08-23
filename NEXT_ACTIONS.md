@@ -4,14 +4,14 @@ Based on AST analysis, here are the concrete next steps.
 
 ## Summary
 
-- **Files Present:** 5/5 (100.0%)
-- **Function parity:** 78/104 matched (target 420) — 75.0%
-- **Class/type parity:** 24/33 matched (target 55) — 72.7%
-- **Combined symbol parity:** 102/137 matched (target 475) — 74.5%
-- **Average inline-code cosine:** 0.46 (function body across 5 matched files)
-- **Average documentation cosine:** 0.66 (doc text across 5 matched files)
-- **Cheat-zeroed Files:** 0
-- **Critical Issues:** 5 files with <0.60 function similarity
+- **Files Present:** 5/6 (83.3%)
+- **Function parity:** 92/115 matched (target 444) — 80.0%
+- **Class/type parity:** 27/33 matched (target 56) — 81.8%
+- **Combined symbol parity:** 119/148 matched (target 500) — 80.4%
+- **Average inline-code cosine:** 0.47 (function body across 4 matched files)
+- **Average documentation cosine:** 0.70 (doc text across 4 matched files)
+- **Cheat-zeroed Files:** 1
+- **Critical Issues:** 4 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
 
@@ -30,28 +30,16 @@ Every matched file is listed below with function and type symbol parity.
 ### 1. glob
 
 - **Target:** `globset.Glob`
-- **Similarity:** 0.59
+- **Similarity:** 0.64
 - **Dependents:** 1
-- **Priority Score:** 1196504.1
-- **Functions:** 37/53 matched (target 326)
-- **Missing functions:** `as_ref`, `eq`, `hash`, `fmt`, `from_str`, `deref`, `deref_mut`, `compile_strategic_matcher`, `add_to_last_range`, `starts_with`, `ends_with`, `s`, `class`, `classn`, `rclass`, `rclassn`
+- **Priority Score:** 1126503.6
+- **Functions:** 44/53 matched (target 336)
+- **Missing functions:** `compile_strategic_matcher`, `add_to_last_range`, `starts_with`, `ends_with`, `s`, `class`, `classn`, `rclass`, `rclassn`
 - **Types:** 9/12 matched (target 25)
 - **Missing types:** `Err`, `Target`, `Options`
 - **Tests:** 0/8 matched
 
-### 2. lib
-
-- **Target:** `globset.Lib`
-- **Similarity:** 0.47
-- **Dependents:** 0
-- **Priority Score:** 105105.3
-- **Functions:** 28/35 matched (target 67)
-- **Missing functions:** `fmt`, `new_regex`, `new_regex_set`, `from_cow`, `prefix`, `suffix`, `regex_set`
-- **Types:** 13/16 matched (target 24)
-- **Missing types:** `PatternSetPoolFn`, `MultiStrategyBuilder`, `RequiredExtensionStrategyBuilder`
-- **Tests:** 5/5 matched
-
-### 3. serde_impl
+### 2. serde_impl
 
 - **Target:** `globset.SerdeImpl`
 - **Similarity:** 0.31
@@ -61,6 +49,18 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** `expecting`, `visit_str`, `visit_seq`
 - **Types:** 0/3 matched
 - **Missing types:** `GlobVisitor`, `Value`, `GlobSetVisitor`
+- **Tests:** 5/5 matched
+
+### 3. lib
+
+- **Target:** `globset.Lib [STUB]`
+- **Similarity:** 0.00
+- **Dependents:** 0
+- **Priority Score:** 5110.0
+- **Functions:** 35/35 matched (target 81)
+- **Missing functions:** _none_
+- **Types:** 16/16 matched (target 25)
+- **Missing types:** _none_
 - **Tests:** 5/5 matched
 
 ### 4. fnv
