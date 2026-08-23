@@ -1,4 +1,4 @@
-// port-lint: source src/lib.rs
+// port-lint: source lib.rs
 package io.github.kotlinmania.globset
 
 /**
@@ -12,23 +12,22 @@ data class Error(
     internal val globValue: String?,
     /** The kind of error. */
     internal val kindValue: ErrorKind,
-) {
+) : Exception(kindValue.description()) {
     /** Return the glob that caused this error, if one exists. */
     fun glob(): String? = globValue
 
     /** Return the kind of this error. */
     fun kind(): ErrorKind = kindValue
 
-    override fun toString(): String = when (globValue) {
-        null -> kindValue.toString()
-        else -> "error parsing glob '$globValue': $kindValue"
-    }
+    override fun toString(): String =
+        when (globValue) {
+            null -> kindValue.toString()
+            else -> "error parsing glob '$globValue': $kindValue"
+        }
 }
 
 /**
  * The kind of error that can occur when parsing a glob pattern.
- *
- * The upstream Rust enum is marked `non_exhaustive`.
  */
 sealed class ErrorKind {
     /**
@@ -50,7 +49,10 @@ sealed class ErrorKind {
      * example, if the range starts with a lexicographically larger character
      * than it ends with.
      */
-    data class InvalidRange(val start: Char, val end: Char) : ErrorKind()
+    data class InvalidRange(
+        val start: Char,
+        val end: Char,
+    ) : ErrorKind()
 
     /** Occurs when a `}` is found without a matching `{`. */
     object UnopenedAlternates : ErrorKind()
@@ -71,31 +73,36 @@ sealed class ErrorKind {
     object DanglingEscape : ErrorKind()
 
     /** An error associated with parsing or compiling a regex. */
-    data class Regex(val message: String) : ErrorKind()
+    data class Regex(
+        val message: String,
+    ) : ErrorKind()
 
-    internal fun description(): String = when (this) {
-        InvalidRecursive -> "invalid use of **; must be one path component"
-        UnclosedClass -> "unclosed character class; missing ']'"
-        is InvalidRange -> "invalid character range"
-        UnopenedAlternates ->
-            "unopened alternate group; missing '{' " +
-                "(maybe escape '}' with '[}]'?)"
-        UnclosedAlternates ->
-            "unclosed alternate group; missing '}' " +
-                "(maybe escape '{' with '[{]'?)"
-        NestedAlternates -> "nested alternate groups are not allowed"
-        DanglingEscape -> "dangling '\\'"
-        is Regex -> message
-    }
+    internal fun description(): String =
+        when (this) {
+            InvalidRecursive -> "invalid use of **; must be one path component"
+            UnclosedClass -> "unclosed character class; missing ']'"
+            is InvalidRange -> "invalid character range"
+            UnopenedAlternates ->
+                "unopened alternate group; missing '{' " +
+                    "(maybe escape '}' with '[}]'?)"
+            UnclosedAlternates ->
+                "unclosed alternate group; missing '}' " +
+                    "(maybe escape '{' with '[{]'?)"
+            NestedAlternates -> "nested alternate groups are not allowed"
+            DanglingEscape -> "dangling '\\'"
+            is Regex -> message
+        }
 
-    override fun toString(): String = when (this) {
-        InvalidRecursive,
-        UnclosedClass,
-        UnopenedAlternates,
-        UnclosedAlternates,
-        NestedAlternates,
-        DanglingEscape,
-        is Regex -> description()
-        is InvalidRange -> "invalid range; '$start' > '$end'"
-    }
+    override fun toString(): String =
+        when (this) {
+            InvalidRecursive,
+            UnclosedClass,
+            UnopenedAlternates,
+            UnclosedAlternates,
+            NestedAlternates,
+            DanglingEscape,
+            is Regex,
+            -> description()
+            is InvalidRange -> "invalid range; '$start' > '$end'"
+        }
 }

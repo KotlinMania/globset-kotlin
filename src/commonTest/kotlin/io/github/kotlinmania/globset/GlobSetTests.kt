@@ -1,0 +1,85 @@
+// port-lint: tests lib.rs
+package io.github.kotlinmania.globset
+
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
+class GlobSetTests {
+    @Test
+    fun setWorks() {
+        val builder = GlobSetBuilder.new()
+        builder.add(Glob.new("src/**/*.rs"))
+        builder.add(Glob.new("*.c"))
+        builder.add(Glob.new("src/lib.rs"))
+        val set = builder.build()
+
+        assertTrue(set.isMatch("foo.c"))
+        assertTrue(set.isMatch("src/foo.c"))
+        assertFalse(set.isMatch("foo.rs"))
+        assertFalse(set.isMatch("tests/foo.rs"))
+        assertTrue(set.isMatch("src/foo.rs"))
+        assertTrue(set.isMatch("src/grep/src/main.rs"))
+
+        val matches = set.matches("src/lib.rs")
+        assertEquals(2, matches.size)
+        assertEquals(0, matches[0])
+        assertEquals(2, matches[1])
+    }
+
+    @Test
+    fun emptySetWorks() {
+        val set = GlobSetBuilder.new().build()
+        assertFalse(set.isMatch(""))
+        assertFalse(set.isMatch("a"))
+        assertTrue(set.matchesAll("a"))
+    }
+
+    @Test
+    fun defaultSetIsEmptyWorks() {
+        val set: GlobSet = GlobSet.default()
+        assertFalse(set.isMatch(""))
+        assertFalse(set.isMatch("a"))
+    }
+
+    @Test
+    fun escape() {
+        assertEquals("foo", escape("foo"))
+        assertEquals("foo[*]", escape("foo*"))
+        assertEquals("[[][]]", escape("[]"))
+        assertEquals("[*][?]", escape("*?"))
+        assertEquals("src/[*][*]/[*].rs", escape("src/**/*.rs"))
+        assertEquals("bar[[]ab[]]baz", escape("bar[ab]baz"))
+        assertEquals("bar[[]!![]]!baz", escape("bar[!!]!baz"))
+    }
+
+    @Test
+    fun setDoesNotRemember() {
+        val builder = GlobSetBuilder.new()
+        builder.add(Glob.new("*foo*"))
+        builder.add(Glob.new("*bar*"))
+        builder.add(Glob.new("*quux*"))
+        val set = builder.build()
+
+        val matches = set.matches("ZfooZquuxZ")
+        assertEquals(2, matches.size)
+        assertEquals(0, matches[0])
+        assertEquals(2, matches[1])
+
+        val matchesNada = set.matches("nada")
+        assertEquals(0, matchesNada.size)
+    }
+
+    @Test
+    fun debug() {
+        val builder = GlobSetBuilder.new()
+        builder.add(Glob.new("*foo*"))
+        builder.add(Glob.new("*bar*"))
+        builder.add(Glob.new("*quux*"))
+        assertEquals(
+            "GlobSetBuilder { pats: [Glob(\"*foo*\"), Glob(\"*bar*\"), Glob(\"*quux*\")] }",
+            builder.toString(),
+        )
+    }
+}
