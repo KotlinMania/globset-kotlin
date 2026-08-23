@@ -4,13 +4,13 @@ Based on AST analysis, here are the concrete next steps.
 
 ## Summary
 
-- **Files Present:** 5/6 (83.3%)
-- **Function parity:** 92/115 matched (target 444) — 80.0%
+- **Files Present:** 5/5 (100.0%)
+- **Function parity:** 92/104 matched (target 445) — 88.5%
 - **Class/type parity:** 27/33 matched (target 56) — 81.8%
-- **Combined symbol parity:** 119/148 matched (target 500) — 80.4%
-- **Average inline-code cosine:** 0.47 (function body across 4 matched files)
-- **Average documentation cosine:** 0.70 (doc text across 4 matched files)
-- **Cheat-zeroed Files:** 1
+- **Combined symbol parity:** 119/137 matched (target 501) — 86.9%
+- **Average inline-code cosine:** 0.49 (function body across 5 matched files)
+- **Average documentation cosine:** 0.72 (doc text across 5 matched files)
+- **Cheat-zeroed Files:** 0
 - **Critical Issues:** 4 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
@@ -53,11 +53,11 @@ Every matched file is listed below with function and type symbol parity.
 
 ### 3. lib
 
-- **Target:** `globset.Lib [STUB]`
-- **Similarity:** 0.00
+- **Target:** `globset.Lib`
+- **Similarity:** 0.55
 - **Dependents:** 0
-- **Priority Score:** 5110.0
-- **Functions:** 35/35 matched (target 81)
+- **Priority Score:** 5104.5
+- **Functions:** 35/35 matched (target 82)
 - **Missing functions:** _none_
 - **Types:** 16/16 matched (target 25)
 - **Missing types:** _none_
