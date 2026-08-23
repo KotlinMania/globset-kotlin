@@ -115,6 +115,9 @@ class Glob internal constructor(
     companion object {
         /** Builds a new pattern with default options. */
         fun new(glob: String): Glob = GlobBuilder.new(glob).build()
+
+        /** Parse a glob pattern from string. */
+        fun fromStr(glob: String): Glob = new(glob)
     }
 
     /** Returns a matcher for this pattern. */
@@ -134,6 +137,12 @@ class Glob internal constructor(
 
     /** Returns the original glob pattern used to build this pattern. */
     fun glob(): String = glob
+
+    /** Returns the string representation of this glob pattern. */
+    fun asStr(): String = glob
+
+    /** Returns the string reference of this glob pattern. */
+    fun asRef(): String = glob
 
     /**
      * Returns the regular expression string for this glob.
