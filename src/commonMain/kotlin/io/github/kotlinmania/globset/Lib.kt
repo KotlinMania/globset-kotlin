@@ -1,4 +1,4 @@
-// port-lint: source src/lib.rs
+// port-lint: source lib.rs
 package io.github.kotlinmania.globset
 
 /**
@@ -586,7 +586,37 @@ internal fun newRegex(pat: String): Regex {
         cleaned = cleaned.removePrefix("(?i)")
         options = setOf(RegexOption.IGNORE_CASE)
     }
+    cleaned = sanitizeRegexForJs(cleaned)
     return Regex(cleaned, options)
+}
+
+private fun sanitizeRegexForJs(pattern: String): String {
+    val sb = StringBuilder(pattern.length)
+    var inClass = false
+    var i = 0
+    while (i < pattern.length) {
+        val c = pattern[i]
+        if (c == '\\' && i + 1 < pattern.length) {
+            val next = pattern[i + 1]
+            if (!inClass && (next == '-' || next == '#' || next == '&' || next == '~')) {
+                sb.append(next)
+                i += 2
+                continue
+            }
+            sb.append('\\')
+            sb.append(next)
+            i += 2
+            continue
+        }
+        if (c == '[') {
+            inClass = true
+        } else if (c == ']') {
+            inClass = false
+        }
+        sb.append(c)
+        i++
+    }
+    return sb.toString()
 }
 
 internal fun newRegexSet(patterns: Iterable<String>): List<Regex> =

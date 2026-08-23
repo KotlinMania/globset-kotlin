@@ -1,4 +1,4 @@
-// port-lint: source src/glob.rs
+// port-lint: source glob.rs
 package io.github.kotlinmania.globset
 
 /**
