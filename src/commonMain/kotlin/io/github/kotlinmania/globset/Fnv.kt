@@ -1,4 +1,4 @@
-// port-lint: source src/fnv.rs
+// port-lint: source fnv.rs
 package io.github.kotlinmania.globset
 
 /** A convenience alias for creating a hash map with an FNV hasher. */
@@ -20,5 +20,7 @@ internal class Hasher(
     companion object {
         private const val OFFSET_BASIS: ULong = 0xcbf29ce484222325uL
         private const val PRIME: ULong = 0x100000001b3uL
+
+        fun default(): Hasher = Hasher()
     }
 }

@@ -1,4 +1,4 @@
-// port-lint: source src/lib.rs
+// port-lint: source lib.rs
 package io.github.kotlinmania.globset
 
 /**
@@ -40,11 +40,38 @@ public class Candidate internal constructor(
         private val EMPTY = ByteArray(0)
     }
 
+    internal val pathString: String get() = path.decodeToString()
+    internal val basenameString: String get() = basename.decodeToString()
+    internal val extString: String get() = ext.decodeToString()
+
     internal fun pathPrefix(max: Int): ByteArray =
         if (path.size <= max) path else path.copyOfRange(0, max)
 
     internal fun pathSuffix(max: Int): ByteArray =
         if (path.size <= max) path else path.copyOfRange(path.size - max, path.size)
+
+    internal fun toByteString(): String {
+        val chars = CharArray(path.size)
+        for (i in path.indices) {
+            chars[i] = (path[i].toInt() and 0xFF).toChar()
+        }
+        return chars.concatToString()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Candidate) return false
+        return path.contentEquals(other.path) &&
+            basename.contentEquals(other.basename) &&
+            ext.contentEquals(other.ext)
+    }
+
+    override fun hashCode(): Int {
+        var result = path.contentHashCode()
+        result = 31 * result + basename.contentHashCode()
+        result = 31 * result + ext.contentHashCode()
+        return result
+    }
 
     override fun toString(): String =
         buildString {

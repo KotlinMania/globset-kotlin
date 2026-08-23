@@ -1,21 +1,19 @@
+// port-lint: source lib.rs
 package io.github.kotlinmania.globset
 
-/*
- * Translation ledger for `src/lib.rs`.
+/**
+ * The globset library provides cross platform single glob and glob set matching.
  *
- * Upstream `src/lib.rs` is a large crate-root file with real implementation,
- * not just re-exports. Per the workspace "lib.rs parceled like mod.rs" rule,
- * its items are parceled into focused Kotlin files; each parceled file
- * carries `// port-lint: source src/lib.rs` so ast_distance can track
- * provenance. This ledger names where each upstream item lives in Kotlin.
+ * Glob set matching is the process of matching one or more glob patterns against
+ * a single candidate path simultaneously, and returning all of the globs that
+ * matched.
  *
- * Items parceled out of `src/lib.rs`:
- *   - `Error` struct          -> Error.kt
- *   - `ErrorKind` enum        -> Error.kt
- *   - `escape` function       -> Escape.kt
- *   - `mod tests::escape`     -> EscapeTests.kt
- *   - `Candidate` struct      -> Candidate.kt
- *   - `mod tests::Candidate`  -> CandidateTests.kt
+ * Module structure:
+ * - Error and ErrorKind types are in Error.kt
+ * - Escape function is in Escape.kt
+ * - Candidate type is in Candidate.kt
+ * - Glob and GlobBuilder types are in Glob.kt
+ * - GlobSet and GlobSetBuilder types are in GlobSet.kt
  */
-
 private const val MODULE_LEDGER = true
+
