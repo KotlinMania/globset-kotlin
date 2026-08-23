@@ -1,4 +1,4 @@
-// port-lint: source src/lib.rs (#[cfg(test)] mod tests::escape)
+// port-lint: tests lib.rs
 package io.github.kotlinmania.globset
 
 import kotlin.test.Test

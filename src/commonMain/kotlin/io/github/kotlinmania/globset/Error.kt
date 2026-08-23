@@ -1,4 +1,4 @@
-// port-lint: source src/lib.rs
+// port-lint: source lib.rs
 package io.github.kotlinmania.globset
 
 /**
@@ -12,7 +12,7 @@ data class Error(
     internal val globValue: String?,
     /** The kind of error. */
     internal val kindValue: ErrorKind,
-) {
+) : Exception(kindValue.description()) {
     /** Return the glob that caused this error, if one exists. */
     fun glob(): String? = globValue
 
@@ -28,8 +28,6 @@ data class Error(
 
 /**
  * The kind of error that can occur when parsing a glob pattern.
- *
- * The upstream Rust enum is marked `non_exhaustive`.
  */
 sealed class ErrorKind {
     /**
