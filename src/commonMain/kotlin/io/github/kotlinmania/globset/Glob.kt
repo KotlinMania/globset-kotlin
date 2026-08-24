@@ -964,15 +964,23 @@ internal fun endsWith(needle: ByteArray, haystack: ByteArray): Boolean {
 
 internal fun s(string: String): String = string
 
-internal fun classTok(s: Char, e: Char): Token =
+internal fun `class`(s: Char, e: Char): Token =
     Token.CharClass(negated = false, ranges = listOf(Pair(s, e)))
 
-internal fun classnTok(s: Char, e: Char): Token =
+internal fun classTok(s: Char, e: Char): Token = `class`(s, e)
+
+internal fun classn(s: Char, e: Char): Token =
     Token.CharClass(negated = true, ranges = listOf(Pair(s, e)))
 
-internal fun rclassTok(ranges: List<Pair<Char, Char>>): Token =
+internal fun classnTok(s: Char, e: Char): Token = classn(s, e)
+
+internal fun rclass(ranges: List<Pair<Char, Char>>): Token =
     Token.CharClass(negated = false, ranges = ranges)
 
-internal fun rclassnTok(ranges: List<Pair<Char, Char>>): Token =
+internal fun rclassTok(ranges: List<Pair<Char, Char>>): Token = rclass(ranges)
+
+internal fun rclassn(ranges: List<Pair<Char, Char>>): Token =
     Token.CharClass(negated = true, ranges = ranges)
+
+internal fun rclassnTok(ranges: List<Pair<Char, Char>>): Token = rclassn(ranges)
 
