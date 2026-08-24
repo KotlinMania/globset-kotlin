@@ -891,12 +891,7 @@ private class Parser(
                     if (first) {
                         ranges.add(Pair('-', '-'))
                     } else if (inRange) {
-                        val lastIdx = ranges.size - 1
-                        val r = ranges[lastIdx]
-                        if ('-' < r.first) {
-                            throw Error(glob, ErrorKind.InvalidRange(r.first, '-'))
-                        }
-                        ranges[lastIdx] = Pair(r.first, '-')
+                        addToLastRange(ranges, '-')
                         inRange = false
                     } else {
                         inRange = true
@@ -904,12 +899,7 @@ private class Parser(
                 }
                 else -> {
                     if (inRange) {
-                        val lastIdx = ranges.size - 1
-                        val r = ranges[lastIdx]
-                        if (c < r.first) {
-                            throw Error(glob, ErrorKind.InvalidRange(r.first, c))
-                        }
-                        ranges[lastIdx] = Pair(r.first, c)
+                        addToLastRange(ranges, c)
                     } else {
                         ranges.add(Pair(c, c))
                     }
@@ -922,6 +912,15 @@ private class Parser(
             ranges.add(Pair('-', '-'))
         }
         pushToken(Token.CharClass(negated, ranges))
+    }
+
+    private fun addToLastRange(ranges: MutableList<Pair<Char, Char>>, add: Char) {
+        val lastIdx = ranges.size - 1
+        val r = ranges[lastIdx]
+        if (add < r.first) {
+            throw Error(glob, ErrorKind.InvalidRange(r.first, add))
+        }
+        ranges[lastIdx] = Pair(r.first, add)
     }
 
     private fun bump(): Char? {
