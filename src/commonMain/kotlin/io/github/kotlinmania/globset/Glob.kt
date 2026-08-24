@@ -113,6 +113,8 @@ class Glob internal constructor(
     internal val tokens: Tokens,
 ) {
     companion object {
+        typealias Err = Error
+
         /** Builds a new pattern with default options. */
         fun new(glob: String): Glob = GlobBuilder.new(glob).build()
 
@@ -517,6 +519,8 @@ internal data class GlobOptions(
     var allowUnclosedClass: Boolean = false,
 ) {
     companion object {
+        typealias Options = GlobOptions
+
         fun default(): GlobOptions = GlobOptions()
     }
 }
@@ -525,6 +529,8 @@ internal class Tokens(
     val list: MutableList<Token> = mutableListOf(),
 ) : MutableList<Token> by list {
     companion object {
+        typealias Target = List<Token>
+
         fun default(): Tokens = Tokens()
     }
 
@@ -955,3 +961,18 @@ internal fun endsWith(needle: ByteArray, haystack: ByteArray): Boolean {
     }
     return true
 }
+
+internal fun s(string: String): String = string
+
+internal fun classTok(s: Char, e: Char): Token =
+    Token.CharClass(negated = false, ranges = listOf(Pair(s, e)))
+
+internal fun classnTok(s: Char, e: Char): Token =
+    Token.CharClass(negated = true, ranges = listOf(Pair(s, e)))
+
+internal fun rclassTok(ranges: List<Pair<Char, Char>>): Token =
+    Token.CharClass(negated = false, ranges = ranges)
+
+internal fun rclassnTok(ranges: List<Pair<Char, Char>>): Token =
+    Token.CharClass(negated = true, ranges = ranges)
+

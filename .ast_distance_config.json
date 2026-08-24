@@ -1,5 +1,6 @@
 {
   "type": "port",
+  "parity_mode": false,
   "name": "globset-kotlin",
   "source": {
     "path": "tmp/globset/src",
