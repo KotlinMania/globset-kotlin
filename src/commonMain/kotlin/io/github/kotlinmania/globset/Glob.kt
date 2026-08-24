@@ -983,4 +983,3 @@ internal fun rclassn(ranges: List<Pair<Char, Char>>): Token =
     Token.CharClass(negated = true, ranges = ranges)
 
 internal fun rclassnTok(ranges: List<Pair<Char, Char>>): Token = rclassn(ranges)
-
