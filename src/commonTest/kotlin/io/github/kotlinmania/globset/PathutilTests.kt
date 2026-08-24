@@ -8,6 +8,14 @@ import kotlin.test.assertNull
 private fun bytes(s: String): ByteArray = s.encodeToByteArray()
 
 class PathutilTests {
+    @Test fun fileName1() = assertEquals("bar.txt", fileName(bytes("foo/bar.txt"))?.decodeToString())
+
+    @Test fun fileName2() = assertEquals("bar.txt", fileName(bytes("bar.txt"))?.decodeToString())
+
+    @Test fun fileNameEmpty() = assertNull(fileName(bytes("")))
+
+    @Test fun fileNameDotDot() = assertNull(fileName(bytes("foo/..")))
+
     @Test fun ext1() = assertEquals(".rs", fileNameExt(bytes("foo.rs"))?.decodeToString())
 
     @Test fun ext2() = assertEquals(".rs", fileNameExt(bytes(".rs"))?.decodeToString())
