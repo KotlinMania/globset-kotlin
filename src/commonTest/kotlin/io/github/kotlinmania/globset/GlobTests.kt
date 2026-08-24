@@ -83,43 +83,43 @@ class GlobTests {
 
     // Syntax tests
     @Test
-    fun syntaxLiteral1() {
+    fun literal1() {
         val glob = Glob.new("a")
         assertEquals(toks(Token.Literal('a')), glob.tokens.list)
     }
 
     @Test
-    fun syntaxLiteral2() {
+    fun literal2() {
         val glob = Glob.new("ab")
         assertEquals(toks(Token.Literal('a'), Token.Literal('b')), glob.tokens.list)
     }
 
     @Test
-    fun syntaxAny1() {
+    fun any1() {
         val glob = Glob.new("?")
         assertEquals(toks(Token.AnyChar), glob.tokens.list)
     }
 
     @Test
-    fun syntaxAny2() {
+    fun any2() {
         val glob = Glob.new("a?b")
         assertEquals(toks(Token.Literal('a'), Token.AnyChar, Token.Literal('b')), glob.tokens.list)
     }
 
     @Test
-    fun syntaxSeq1() {
+    fun seq1() {
         val glob = Glob.new("*")
         assertEquals(toks(Token.ZeroOrMore), glob.tokens.list)
     }
 
     @Test
-    fun syntaxSeq2() {
+    fun seq2() {
         val glob = Glob.new("a*b")
         assertEquals(toks(Token.Literal('a'), Token.ZeroOrMore, Token.Literal('b')), glob.tokens.list)
     }
 
     @Test
-    fun syntaxSeq3() {
+    fun seq3() {
         val glob = Glob.new("*a*b*")
         assertEquals(
             toks(Token.ZeroOrMore, Token.Literal('a'), Token.ZeroOrMore, Token.Literal('b'), Token.ZeroOrMore),
@@ -128,97 +128,97 @@ class GlobTests {
     }
 
     @Test
-    fun syntaxRseq1() {
+    fun rseq1() {
         val glob = Glob.new("**")
         assertEquals(toks(Token.RecursivePrefix), glob.tokens.list)
     }
 
     @Test
-    fun syntaxRseq2() {
+    fun rseq2() {
         val glob = Glob.new("**/")
         assertEquals(toks(Token.RecursivePrefix), glob.tokens.list)
     }
 
     @Test
-    fun syntaxRseq3() {
+    fun rseq3() {
         val glob = Glob.new("/**")
         assertEquals(toks(Token.RecursiveSuffix), glob.tokens.list)
     }
 
     @Test
-    fun syntaxRseq4() {
+    fun rseq4() {
         val glob = Glob.new("/**/")
         assertEquals(toks(Token.RecursiveZeroOrMore), glob.tokens.list)
     }
 
     @Test
-    fun syntaxRseq5() {
+    fun rseq5() {
         val glob = Glob.new("a/**/b")
         assertEquals(toks(Token.Literal('a'), Token.RecursiveZeroOrMore, Token.Literal('b')), glob.tokens.list)
     }
 
     @Test
-    fun syntaxCls1() = assertEquals(toks(classTok('a', 'a')), Glob.new("[a]").tokens.list)
+    fun cls1() = assertEquals(toks(classTok('a', 'a')), Glob.new("[a]").tokens.list)
 
     @Test
-    fun syntaxCls2() = assertEquals(toks(classnTok('a', 'a')), Glob.new("[!a]").tokens.list)
+    fun cls2() = assertEquals(toks(classnTok('a', 'a')), Glob.new("[!a]").tokens.list)
 
     @Test
-    fun syntaxCls3() = assertEquals(toks(classTok('a', 'z')), Glob.new("[a-z]").tokens.list)
+    fun cls3() = assertEquals(toks(classTok('a', 'z')), Glob.new("[a-z]").tokens.list)
 
     @Test
-    fun syntaxCls4() = assertEquals(toks(classnTok('a', 'z')), Glob.new("[!a-z]").tokens.list)
+    fun cls4() = assertEquals(toks(classnTok('a', 'z')), Glob.new("[!a-z]").tokens.list)
 
     @Test
-    fun syntaxCls5() = assertEquals(toks(classTok('-', '-')), Glob.new("[-]").tokens.list)
+    fun cls5() = assertEquals(toks(classTok('-', '-')), Glob.new("[-]").tokens.list)
 
     @Test
-    fun syntaxCls6() = assertEquals(toks(classTok(']', ']')), Glob.new("[]]").tokens.list)
+    fun cls6() = assertEquals(toks(classTok(']', ']')), Glob.new("[]]").tokens.list)
 
     @Test
-    fun syntaxCls7() = assertEquals(toks(classTok('*', '*')), Glob.new("[*]").tokens.list)
+    fun cls7() = assertEquals(toks(classTok('*', '*')), Glob.new("[*]").tokens.list)
 
     @Test
-    fun syntaxCls8() = assertEquals(toks(classnTok('!', '!')), Glob.new("[!!]").tokens.list)
+    fun cls8() = assertEquals(toks(classnTok('!', '!')), Glob.new("[!!]").tokens.list)
 
     @Test
-    fun syntaxCls9() = assertEquals(toks(rclassTok('a' to 'a', '-' to '-')), Glob.new("[a-]").tokens.list)
+    fun cls9() = assertEquals(toks(rclassTok('a' to 'a', '-' to '-')), Glob.new("[a-]").tokens.list)
 
     @Test
-    fun syntaxCls10() = assertEquals(toks(rclassTok('-' to '-', 'a' to 'z')), Glob.new("[-a-z]").tokens.list)
+    fun cls10() = assertEquals(toks(rclassTok('-' to '-', 'a' to 'z')), Glob.new("[-a-z]").tokens.list)
 
     @Test
-    fun syntaxCls11() = assertEquals(toks(rclassTok('a' to 'z', '-' to '-')), Glob.new("[a-z-]").tokens.list)
+    fun cls11() = assertEquals(toks(rclassTok('a' to 'z', '-' to '-')), Glob.new("[a-z-]").tokens.list)
 
     @Test
-    fun syntaxCls12() = assertEquals(toks(rclassTok('-' to '-', 'a' to 'z', '-' to '-')), Glob.new("[-a-z-]").tokens.list)
+    fun cls12() = assertEquals(toks(rclassTok('-' to '-', 'a' to 'z', '-' to '-')), Glob.new("[-a-z-]").tokens.list)
 
     @Test
-    fun syntaxCls13() = assertEquals(toks(classTok(']', 'z')), Glob.new("[]-z]").tokens.list)
+    fun cls13() = assertEquals(toks(classTok(']', 'z')), Glob.new("[]-z]").tokens.list)
 
     @Test
-    fun syntaxCls14() = assertEquals(toks(classTok('-', 'z')), Glob.new("[--z]").tokens.list)
+    fun cls14() = assertEquals(toks(classTok('-', 'z')), Glob.new("[--z]").tokens.list)
 
     @Test
-    fun syntaxCls15() = assertEquals(toks(classTok(' ', '-')), Glob.new("[ --]").tokens.list)
+    fun cls15() = assertEquals(toks(classTok(' ', '-')), Glob.new("[ --]").tokens.list)
 
     @Test
-    fun syntaxCls16() = assertEquals(toks(rclassTok('0' to '9', 'a' to 'z')), Glob.new("[0-9a-z]").tokens.list)
+    fun cls16() = assertEquals(toks(rclassTok('0' to '9', 'a' to 'z')), Glob.new("[0-9a-z]").tokens.list)
 
     @Test
-    fun syntaxCls17() = assertEquals(toks(rclassTok('a' to 'z', '0' to '9')), Glob.new("[a-z0-9]").tokens.list)
+    fun cls17() = assertEquals(toks(rclassTok('a' to 'z', '0' to '9')), Glob.new("[a-z0-9]").tokens.list)
 
     @Test
-    fun syntaxCls18() = assertEquals(toks(rclassnTok('0' to '9', 'a' to 'z')), Glob.new("[!0-9a-z]").tokens.list)
+    fun cls18() = assertEquals(toks(rclassnTok('0' to '9', 'a' to 'z')), Glob.new("[!0-9a-z]").tokens.list)
 
     @Test
-    fun syntaxCls19() = assertEquals(toks(rclassnTok('a' to 'z', '0' to '9')), Glob.new("[!a-z0-9]").tokens.list)
+    fun cls19() = assertEquals(toks(rclassnTok('a' to 'z', '0' to '9')), Glob.new("[!a-z0-9]").tokens.list)
 
     @Test
-    fun syntaxCls20() = assertEquals(toks(classnTok('a', 'a')), Glob.new("[^a]").tokens.list)
+    fun cls20() = assertEquals(toks(classnTok('a', 'a')), Glob.new("[^a]").tokens.list)
 
     @Test
-    fun syntaxCls21() = assertEquals(toks(classnTok('a', 'z')), Glob.new("[^a-z]").tokens.list)
+    fun cls21() = assertEquals(toks(classnTok('a', 'z')), Glob.new("[^a-z]").tokens.list)
 
     // Syntax error tests
     @Test
