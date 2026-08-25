@@ -1,6 +1,7 @@
 // port-lint: tests glob.rs
 package io.github.kotlinmania.globset
 
+
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -67,6 +68,25 @@ class GlobTests {
         assertEquals("(?-u)$expectedRe", glob.regex())
     }
 
+    private fun startsWith(needle: ByteArray, haystack: ByteArray): Boolean {
+        if (needle.size > haystack.size) return false
+        for (i in needle.indices) {
+            if (needle[i] != haystack[i]) return false
+        }
+        return true
+    }
+
+    private fun endsWith(needle: ByteArray, haystack: ByteArray): Boolean {
+        if (needle.size > haystack.size) return false
+        val offset = haystack.size - needle.size
+        for (i in needle.indices) {
+            if (needle[i] != haystack[offset + i]) return false
+        }
+        return true
+    }
+
+    private fun s(string: String): String = string
+
     private fun toks(vararg tokens: Token): List<Token> = tokens.toList()
 
     private fun classTok(s: Char, e: Char): Token =
@@ -80,6 +100,7 @@ class GlobTests {
 
     private fun rclassnTok(vararg ranges: Pair<Char, Char>): Token =
         Token.CharClass(negated = true, ranges = ranges.toList())
+
 
     // Syntax tests
     @Test
