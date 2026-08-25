@@ -977,9 +977,15 @@ internal fun classnTok(s: Char, e: Char): Token = classn(s, e)
 internal fun rclass(ranges: List<Pair<Char, Char>>): Token =
     Token.CharClass(negated = false, ranges = ranges)
 
+internal fun rclass(vararg ranges: Pair<Char, Char>): Token =
+    Token.CharClass(negated = false, ranges = ranges.toList())
+
 internal fun rclassTok(ranges: List<Pair<Char, Char>>): Token = rclass(ranges)
 
 internal fun rclassn(ranges: List<Pair<Char, Char>>): Token =
     Token.CharClass(negated = true, ranges = ranges)
+
+internal fun rclassn(vararg ranges: Pair<Char, Char>): Token =
+    Token.CharClass(negated = true, ranges = ranges.toList())
 
 internal fun rclassnTok(ranges: List<Pair<Char, Char>>): Token = rclassn(ranges)
