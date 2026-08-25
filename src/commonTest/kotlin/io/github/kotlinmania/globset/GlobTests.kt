@@ -9,7 +9,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class GlobTests {
-    private data class TestOptions(
+    private data class Options(
         val casei: Boolean? = null,
         val litsep: Boolean? = null,
         val bsesc: Boolean? = null,
@@ -17,14 +17,14 @@ class GlobTests {
         val unccls: Boolean? = null,
     )
 
-    private val CASEI = TestOptions(casei = true)
-    private val SLASHLIT = TestOptions(litsep = true)
-    private val NOBSESC = TestOptions(bsesc = false)
-    private val BSESC = TestOptions(bsesc = true)
-    private val EALTRE = TestOptions(bsesc = true, ealtre = true)
-    private val UNCCLS = TestOptions(unccls = true)
+    private val CASEI = Options(casei = true)
+    private val SLASHLIT = Options(litsep = true)
+    private val NOBSESC = Options(bsesc = false)
+    private val BSESC = Options(bsesc = true)
+    private val EALTRE = Options(bsesc = true, ealtre = true)
+    private val UNCCLS = Options(unccls = true)
 
-    private fun testMatches(pat: String, path: String, options: TestOptions = TestOptions()) {
+    private fun testMatches(pat: String, path: String, options: Options = Options()) {
         val builder = GlobBuilder.new(pat)
         options.casei?.let { builder.caseInsensitive(it) }
         options.litsep?.let { builder.literalSeparator(it) }
@@ -40,7 +40,7 @@ class GlobTests {
         assertTrue(set.isMatch(path), "set failed for pat '$pat' and path '$path'")
     }
 
-    private fun testNMatches(pat: String, path: String, options: TestOptions = TestOptions()) {
+    private fun testNMatches(pat: String, path: String, options: Options = Options()) {
         val builder = GlobBuilder.new(pat)
         options.casei?.let { builder.caseInsensitive(it) }
         options.litsep?.let { builder.literalSeparator(it) }
@@ -56,7 +56,7 @@ class GlobTests {
         assertFalse(set.isMatch(path), "set should not match pat '$pat' and path '$path'")
     }
 
-    private fun testToRegex(pat: String, expectedRe: String, options: TestOptions = TestOptions()) {
+    private fun testToRegex(pat: String, expectedRe: String, options: Options = Options()) {
         val builder = GlobBuilder.new(pat)
         options.casei?.let { builder.caseInsensitive(it) }
         options.litsep?.let { builder.literalSeparator(it) }
