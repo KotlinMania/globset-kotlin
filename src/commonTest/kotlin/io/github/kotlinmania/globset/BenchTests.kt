@@ -1,4 +1,4 @@
-// port-lint: tests benches/bench.rs
+// port-lint: tests globset/benches/bench.rs
 package io.github.kotlinmania.globset
 
 import kotlin.test.Test
