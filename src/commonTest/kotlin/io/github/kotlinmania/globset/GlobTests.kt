@@ -88,17 +88,25 @@ class GlobTests {
 
     private fun toks(vararg tokens: Token): List<Token> = tokens.toList()
 
-    private fun classTok(s: Char, e: Char): Token =
+    private fun `class`(s: Char, e: Char): Token =
         Token.CharClass(negated = false, ranges = listOf(Pair(s, e)))
 
-    private fun classnTok(s: Char, e: Char): Token =
+    private fun classTok(s: Char, e: Char): Token = `class`(s, e)
+
+    private fun classn(s: Char, e: Char): Token =
         Token.CharClass(negated = true, ranges = listOf(Pair(s, e)))
 
-    private fun rclassTok(vararg ranges: Pair<Char, Char>): Token =
+    private fun classnTok(s: Char, e: Char): Token = classn(s, e)
+
+    private fun rclass(vararg ranges: Pair<Char, Char>): Token =
         Token.CharClass(negated = false, ranges = ranges.toList())
 
-    private fun rclassnTok(vararg ranges: Pair<Char, Char>): Token =
+    private fun rclassTok(vararg ranges: Pair<Char, Char>): Token = rclass(*ranges)
+
+    private fun rclassn(vararg ranges: Pair<Char, Char>): Token =
         Token.CharClass(negated = true, ranges = ranges.toList())
+
+    private fun rclassnTok(vararg ranges: Pair<Char, Char>): Token = rclassn(*ranges)
 
     // Syntax tests
     @Test
