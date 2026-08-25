@@ -569,7 +569,7 @@ internal class Tokens(
         return re.toString()
     }
 
-    private fun tokensToRegex(
+    internal fun tokensToRegex(
         options: GlobOptions,
         tokens: List<Token>,
         re: StringBuilder,
