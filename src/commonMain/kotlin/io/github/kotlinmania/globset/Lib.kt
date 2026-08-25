@@ -518,7 +518,6 @@ internal class RegexSetStrategy(
     }
 }
 
-internal typealias PatternSetPoolFn = () -> List<Int>
 
 internal class MultiStrategyBuilder {
     internal val literals = mutableListOf<String>()

@@ -113,8 +113,6 @@ class Glob internal constructor(
     internal val tokens: Tokens,
 ) {
     companion object {
-        typealias Err = Error
-
         /** Builds a new pattern with default options. */
         fun new(glob: String): Glob = GlobBuilder.new(glob).build()
 
@@ -511,16 +509,35 @@ class GlobBuilder internal constructor(
     }
 }
 
+/**
+ * Options for a glob pattern.
+ */
 internal data class GlobOptions(
+    /** Whether matching is case-insensitive. */
     var caseInsensitive: Boolean = false,
+    /**
+     * Whether to require a literal separator to correspond to a separator in a file
+     * path. For example, when enabled, `*` will not recognize `/`.
+     */
     var literalSeparator: Boolean = false,
+    /**
+     * Whether or not to use `\` to escape special characters.
+     * For example, when enabled, `\*` will recognize a literal `*`.
+     */
     var backslashEscape: Boolean = true,
+    /**
+     * Whether or not an empty case in an alternate will be removed.
+     */
     var emptyAlternates: Boolean = false,
+    /**
+     * Whether or not an unclosed character class is allowed. When an unclosed
+     * character class is found, the opening `[` is treated as a literal `[`.
+     * When this isn't enabled, an opening `[` without a corresponding `]` is
+     * treated as an error.
+     */
     var allowUnclosedClass: Boolean = false,
 ) {
     companion object {
-        typealias Options = GlobOptions
-
         fun default(): GlobOptions = GlobOptions()
     }
 }
@@ -529,8 +546,6 @@ internal class Tokens(
     val list: MutableList<Token> = mutableListOf(),
 ) : MutableList<Token> by list {
     companion object {
-        typealias Target = List<Token>
-
         fun default(): Tokens = Tokens()
     }
 
