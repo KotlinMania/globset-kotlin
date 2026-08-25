@@ -1,6 +1,9 @@
 // port-lint: source glob.rs
 package io.github.kotlinmania.globset
 
+public typealias Err = Error
+public typealias Target = Glob
+
 /**
  * Describes a matching strategy for a particular pattern.
  *
