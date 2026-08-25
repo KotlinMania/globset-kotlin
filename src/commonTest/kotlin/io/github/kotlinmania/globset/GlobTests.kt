@@ -1,7 +1,6 @@
 // port-lint: tests glob.rs
 package io.github.kotlinmania.globset
 
-
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -100,7 +99,6 @@ class GlobTests {
 
     private fun rclassnTok(vararg ranges: Pair<Char, Char>): Token =
         Token.CharClass(negated = true, ranges = ranges.toList())
-
 
     // Syntax tests
     @Test
