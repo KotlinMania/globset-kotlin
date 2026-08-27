@@ -3,7 +3,7 @@
   "parity_mode": false,
   "name": "globset-kotlin",
   "source": {
-    "path": "tmp/globset",
+    "path": "tmp/globset/src",
     "lang": "rust"
   },
   "target": {
