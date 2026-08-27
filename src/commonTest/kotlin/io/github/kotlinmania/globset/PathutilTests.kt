@@ -1,4 +1,4 @@
-// port-lint: tests pathutil.rs
+// port-lint: tests src/pathutil.rs
 package io.github.kotlinmania.globset
 
 import kotlin.test.Test

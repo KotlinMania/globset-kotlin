@@ -1,4 +1,4 @@
-// port-lint: source serde_impl.rs
+// port-lint: source src/serde_impl.rs
 package io.github.kotlinmania.globset
 
 import kotlinx.serialization.KSerializer
