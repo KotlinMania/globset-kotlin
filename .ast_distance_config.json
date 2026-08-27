@@ -3,7 +3,7 @@
   "parity_mode": false,
   "name": "globset-kotlin",
   "source": {
-    "path": "tmp/globset/src",
+    "path": "tmp/globset",
     "lang": "rust"
   },
   "target": {
@@ -17,7 +17,6 @@
     "lint": true
   },
   "reexport_modules": [
-    "mod.rs",
-    "lib.rs"
+    "mod.rs"
   ]
 }
