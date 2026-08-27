@@ -520,7 +520,6 @@ internal class RegexSetStrategy(
     }
 }
 
-
 internal class MultiStrategyBuilder {
     internal val literals = mutableListOf<String>()
     internal val map = mutableListOf<Int>()
