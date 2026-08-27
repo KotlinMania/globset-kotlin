@@ -1,4 +1,4 @@
-// port-lint: source src/pathutil.rs
+// port-lint: source globset/src/pathutil.rs
 package io.github.kotlinmania.globset
 
 private const val SLASH: Byte = '/'.code.toByte()
