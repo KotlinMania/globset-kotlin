@@ -1,4 +1,4 @@
-// port-lint: tests globset/src/glob.rs
+// port-lint: tests glob.rs
 package io.github.kotlinmania.globset
 
 import kotlin.test.Test
