@@ -494,7 +494,7 @@ class GlobBuilder internal constructor(
 
     /**
      * Toggle whether an empty pattern in a list of alternates is accepted.
-     * For example, if this is set then the glob `foo{,.txt}` will match both
+     * For example, when enabled the glob pattern `foo` with empty alternates will match both
      * `foo` and `foo.txt`.
      *
      * By default this is false.
