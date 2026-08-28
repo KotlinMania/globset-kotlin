@@ -2,6 +2,8 @@
 package io.github.kotlinmania.globset
 
 /**
+ * Cross-platform single glob and glob set evaluation engine.
+ *
  * Represents an error that can occur when parsing a glob pattern.
  */
 data class Error(
@@ -51,18 +53,18 @@ sealed class ErrorKind {
         val end: Char,
     ) : ErrorKind()
 
-    /** Occurs when a `}` is found without a matching `{`. */
+    /** Occurs when a closing brace is found without a corresponding opening brace. */
     object UnopenedAlternates : ErrorKind()
 
-    /** Occurs when a `{` is found without a matching `}`. */
+    /** Occurs when an opening brace is found without a corresponding closing brace. */
     object UnclosedAlternates : ErrorKind()
 
     /**
      * **DEPRECATED**.
      *
      * This error used to occur when an alternating group was nested inside
-     * another alternating group, e.g., `{{a,b},{c,d}}`. However, this is now
-     * supported and as such this error cannot occur.
+     * another alternating group. However, this is now supported and as such
+     * this error cannot occur.
      */
     object NestedAlternates : ErrorKind()
 
