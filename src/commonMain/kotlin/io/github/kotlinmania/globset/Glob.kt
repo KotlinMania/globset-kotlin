@@ -134,8 +134,8 @@ class Glob internal constructor(
      */
     internal fun compileStrategicMatcher(): GlobStrategic {
         val strategy = MatchStrategy.new(this)
-        val regex = newRegex(re)
-        return GlobStrategic(strategy, regex)
+        val re = newRegex(re)
+        return GlobStrategic(strategy, re)
     }
 
     /** Returns the original glob pattern used to build this pattern. */
@@ -964,46 +964,47 @@ private class Parser(
 private fun isPathSeparator(c: Char): Boolean = c == '/' || c == '\\'
 
 internal fun startsWith(needle: ByteArray, haystack: ByteArray): Boolean {
-    if (needle.size > haystack.size) return false
-    for (i in needle.indices) {
-        if (haystack[i] != needle[i]) return false
-    }
-    return true
+    return needle.size <= haystack.size && needle.contentEquals(haystack.copyOfRange(0, needle.size))
 }
 
 internal fun endsWith(needle: ByteArray, haystack: ByteArray): Boolean {
-    if (needle.size > haystack.size) return false
-    val offset = haystack.size - needle.size
-    for (i in needle.indices) {
-        if (haystack[offset + i] != needle[i]) return false
+    if (needle.size > haystack.size) {
+        return false
     }
-    return true
+    return needle.contentEquals(haystack.copyOfRange(haystack.size - needle.size, haystack.size))
 }
 
-internal fun s(string: String): String = string
+internal fun s(string: String): String {
+    return string
+}
 
-internal fun `class`(s: Char, e: Char): Token =
-    Token.CharClass(negated = false, ranges = listOf(Pair(s, e)))
+internal fun `class`(s: Char, e: Char): Token {
+    return Token.CharClass(negated = false, ranges = listOf(Pair(s, e)))
+}
 
 internal fun classTok(s: Char, e: Char): Token = `class`(s, e)
 
-internal fun classn(s: Char, e: Char): Token =
-    Token.CharClass(negated = true, ranges = listOf(Pair(s, e)))
+internal fun classn(s: Char, e: Char): Token {
+    return Token.CharClass(negated = true, ranges = listOf(Pair(s, e)))
+}
 
 internal fun classnTok(s: Char, e: Char): Token = classn(s, e)
 
-internal fun rclass(ranges: List<Pair<Char, Char>>): Token =
-    Token.CharClass(negated = false, ranges = ranges)
+internal fun rclass(ranges: List<Pair<Char, Char>>): Token {
+    return Token.CharClass(negated = false, ranges = ranges)
+}
 
 internal fun rclass(vararg ranges: Pair<Char, Char>): Token =
     Token.CharClass(negated = false, ranges = ranges.toList())
 
 internal fun rclassTok(ranges: List<Pair<Char, Char>>): Token = rclass(ranges)
 
-internal fun rclassn(ranges: List<Pair<Char, Char>>): Token =
-    Token.CharClass(negated = true, ranges = ranges)
+internal fun rclassn(ranges: List<Pair<Char, Char>>): Token {
+    return Token.CharClass(negated = true, ranges = ranges)
+}
 
 internal fun rclassn(vararg ranges: Pair<Char, Char>): Token =
     Token.CharClass(negated = true, ranges = ranges.toList())
 
 internal fun rclassnTok(ranges: List<Pair<Char, Char>>): Token = rclassn(ranges)
+
