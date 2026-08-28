@@ -116,14 +116,18 @@ class Glob internal constructor(
     internal val tokens: Tokens,
 ) {
     companion object {
-        /** Builds a new pattern with default options. */
+        /**
+         * Builds a new pattern with default options.
+         */
         fun new(glob: String): Glob = GlobBuilder.new(glob).build()
 
         /** Parse a glob pattern from string. */
         fun fromStr(glob: String): Glob = new(glob)
     }
 
-    /** Returns a matcher for this pattern. */
+    /**
+     * Returns a matcher for this pattern.
+     */
     fun compileMatcher(): GlobMatcher {
         val regex = newRegex(re)
         return GlobMatcher(this, regex)
@@ -459,13 +463,19 @@ class GlobBuilder internal constructor(
         fun new(glob: String): GlobBuilder = GlobBuilder(glob)
     }
 
-    /** Toggle whether the pattern matches case insensitively or not. */
+    /**
+     * Toggle whether the pattern matches case insensitively or not.
+     * This is disabled by default.
+     */
     fun caseInsensitive(yes: Boolean): GlobBuilder {
         opts.caseInsensitive = yes
         return this
     }
 
-    /** Toggle whether a literal `/` is required to match a path separator. */
+    /**
+     * Toggle whether a literal `/` is required to match a path separator.
+     * By default this is false: `*` and `?` will match `/`.
+     */
     fun literalSeparator(yes: Boolean): GlobBuilder {
         opts.literalSeparator = yes
         return this
@@ -473,20 +483,37 @@ class GlobBuilder internal constructor(
 
     /**
      * When enabled, a back slash (`\`) may be used to escape
-     * special characters in a glob pattern.
+     * special characters in a glob pattern. Additionally, this will
+     * prevent `\` from being interpreted as a path separator on all
+     * platforms.
      */
     fun backslashEscape(yes: Boolean): GlobBuilder {
         opts.backslashEscape = yes
         return this
     }
 
-    /** Toggle whether an empty pattern in a list of alternates is accepted. */
+    /**
+     * Toggle whether an empty pattern in a list of alternates is accepted.
+     * For example, if this is set then the glob `foo{,.txt}` will match both
+     * `foo` and `foo.txt`.
+     *
+     * By default this is false.
+     */
     fun emptyAlternates(yes: Boolean): GlobBuilder {
         opts.emptyAlternates = yes
         return this
     }
 
-    /** Toggle whether unclosed character classes are allowed. */
+    /**
+     * Toggle whether unclosed character classes are allowed. When allowed,
+     * a `[` without a matching `]` is treated literally instead of resulting
+     * in a parse error.
+     *
+     * For example, if this is set then the glob `[abc` will be treated as the
+     * literal string `[abc` instead of returning an error.
+     *
+     * By default, this is false.
+     */
     fun allowUnclosedClass(yes: Boolean): GlobBuilder {
         opts.allowUnclosedClass = yes
         return this
