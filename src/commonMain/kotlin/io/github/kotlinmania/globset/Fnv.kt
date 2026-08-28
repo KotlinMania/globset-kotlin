@@ -8,8 +8,10 @@ internal typealias HashMap<K, V> = kotlin.collections.HashMap<K, V>
 internal class Hasher(
     private var state: ULong = OFFSET_BASIS,
 ) {
+    /** Returns the finished hash value. */
     fun finish(): ULong = state
 
+    /** Writes a slice of bytes into the hasher state. */
     fun write(bytes: ByteArray) {
         for (byte in bytes) {
             state = state xor byte.toUByte().toULong()
@@ -21,6 +23,7 @@ internal class Hasher(
         private const val OFFSET_BASIS: ULong = 0xcbf29ce484222325uL
         private const val PRIME: ULong = 0x100000001b3uL
 
+        /** Creates a default Hasher initialized with [OFFSET_BASIS]. */
         fun default(): Hasher = Hasher()
     }
 }

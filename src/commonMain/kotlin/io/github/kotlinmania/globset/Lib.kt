@@ -192,7 +192,7 @@ class Candidate internal constructor(
 }
 
 /**
- * A GlobSet represents a group of globs that can be matched together in a
+ * GlobSet represents a group of globs that can be matched together in a
  * single pass.
  */
 class GlobSet internal constructor(
@@ -200,16 +200,23 @@ class GlobSet internal constructor(
     internal val strats: List<GlobSetMatchStrategy>,
 ) {
     companion object {
-        /** Create a new empty GlobSet. */
+        /** Create an empty GlobSet. An empty set matches nothing. */
         fun empty(): GlobSet = GlobSet(0, emptyList())
 
-        /** Create a new builder for a GlobSet. */
+        /**
+         * Create a new [GlobSetBuilder]. A `GlobSetBuilder` can be used to add
+         * new patterns. Once all patterns have been added, `build` should be
+         * called to produce a `GlobSet`, which can then be used for matching.
+         */
         fun builder(): GlobSetBuilder = GlobSetBuilder.new()
 
-        /** Default empty GlobSet. */
+        /** Create a default empty GlobSet. */
         fun default(): GlobSet = empty()
 
-        /** Create a GlobSet from a collection of globs. */
+        /**
+         * Builds a new matcher from a collection of Glob patterns.
+         * Once a matcher is built, no new patterns can be added to it.
+         */
         fun new(globs: Iterable<Glob>): GlobSet {
             val builder = GlobSetBuilder.new()
             for (g in globs) {
@@ -219,7 +226,7 @@ class GlobSet internal constructor(
         }
     }
 
-    /** Returns true if there are no globs in this set. */
+    /** Returns true if this set is empty, and therefore matches nothing. */
     fun isEmpty(): Boolean = len == 0
 
     /** Returns the number of globs in this set. */
@@ -228,13 +235,18 @@ class GlobSet internal constructor(
     /** Returns the number of globs in this set. */
     val size: Int get() = len
 
-    /** Returns true if and only if any glob in this set matches the given path. */
+    /** Returns true if any glob in this set matches the path given. */
     fun isMatch(path: String): Boolean = isMatchCandidate(Candidate.new(path))
 
-    /** Returns true if and only if any glob in this set matches the given path. */
+    /** Returns true if any glob in this set matches the path given. */
     fun isMatch(path: ByteArray): Boolean = isMatchCandidate(Candidate.fromBytes(path))
 
-    /** Returns true if and only if any glob in this set matches the candidate. */
+    /**
+     * Returns true if any glob in this set matches the path given.
+     *
+     * This takes a [Candidate] as input, which can be used to amortize the
+     * cost of preparing a path for matching.
+     */
     fun isMatchCandidate(candidate: Candidate): Boolean {
         if (len == 0) return false
         for (strat in strats) {
@@ -243,13 +255,31 @@ class GlobSet internal constructor(
         return false
     }
 
-    /** Returns true if and only if all globs in this set match the given path. */
+    /**
+     * Returns true if all globs in this set match the path given.
+     *
+     * This will return true if the set of globs is empty, as in that case all
+     * `0` of the globs will match.
+     */
     fun matchesAll(path: String): Boolean = matchesAllCandidate(Candidate.new(path))
 
-    /** Returns true if and only if all globs in this set match the given path. */
+    /**
+     * Returns true if all globs in this set match the path given.
+     *
+     * This will return true if the set of globs is empty, as in that case all
+     * `0` of the globs will match.
+     */
     fun matchesAll(path: ByteArray): Boolean = matchesAllCandidate(Candidate.fromBytes(path))
 
-    /** Returns true if and only if all globs in this set match the candidate. */
+    /**
+     * Returns true if all globs in this set match the path given.
+     *
+     * This takes a [Candidate] as input, which can be used to amortize the cost
+     * of preparing a path for matching.
+     *
+     * This will return true if the set of globs is empty, as in that case all
+     * `0` of the globs will match.
+     */
     fun matchesAllCandidate(candidate: Candidate): Boolean {
         if (len == 0) return true
         val matches = mutableListOf<Int>()
@@ -257,30 +287,66 @@ class GlobSet internal constructor(
         return matches.size == len
     }
 
-    /** Returns the set of all information matching this pattern. */
+    /**
+     * Returns the sequence number of every glob pattern that matches the
+     * given path.
+     */
     fun matches(path: String): List<Int> = matchesCandidate(Candidate.new(path))
 
-    /** Returns the set of all information matching this pattern. */
+    /**
+     * Returns the sequence number of every glob pattern that matches the
+     * given path.
+     */
     fun matches(path: ByteArray): List<Int> = matchesCandidate(Candidate.fromBytes(path))
 
-    /** Returns the set of all information matching this pattern. */
+    /**
+     * Returns the sequence number of every glob pattern that matches the
+     * given path.
+     *
+     * This takes a [Candidate] as input, which can be used to amortize the
+     * cost of preparing a path for matching.
+     */
     fun matchesCandidate(candidate: Candidate): List<Int> {
         val matches = mutableListOf<Int>()
         matchesCandidateInto(candidate, matches)
         return matches
     }
 
-    /** Matches the given path and populates the given list. */
+    /**
+     * Adds the sequence number of every glob pattern that matches the given
+     * path to the list given.
+     *
+     * [matches] is cleared before matching begins, and contains the set of
+     * sequence numbers (in ascending order) after matching ends. If no globs
+     * were matched, then [matches] will be empty.
+     */
     fun matchesInto(path: String, matches: MutableList<Int>) {
         matchesCandidateInto(Candidate.new(path), matches)
     }
 
-    /** Matches the given path and populates the given list. */
+    /**
+     * Adds the sequence number of every glob pattern that matches the given
+     * path to the list given.
+     *
+     * [matches] is cleared before matching begins, and contains the set of
+     * sequence numbers (in ascending order) after matching ends. If no globs
+     * were matched, then [matches] will be empty.
+     */
     fun matchesInto(path: ByteArray, matches: MutableList<Int>) {
         matchesCandidateInto(Candidate.fromBytes(path), matches)
     }
 
-    /** Matches the given candidate and populates the given list. */
+    /**
+     * Adds the sequence number of every glob pattern that matches the given
+     * candidate to the list given.
+     *
+     * [matches] is cleared before matching begins, and contains the set of
+     * sequence numbers (in ascending order) after matching ends. If no globs
+     * were matched, then [matches] will be empty.
+     *
+     * This takes a [Candidate] as input, which can be used to amortize the
+     * cost of preparing a path for matching.
+     */
     fun matchesCandidateInto(candidate: Candidate, matches: MutableList<Int>) {
         matches.clear()
         if (len == 0) return
@@ -310,20 +376,25 @@ class GlobSet internal constructor(
 }
 
 /**
- * A builder for a GlobSet.
+ * GlobSetBuilder builds a group of patterns that can be used to
+ * simultaneously match a file path.
  */
 class GlobSetBuilder internal constructor() {
     internal val pats: MutableList<Glob> = mutableListOf()
 
     companion object {
-        /** Create a new builder for a GlobSet. */
+        /**
+         * Create a new `GlobSetBuilder`. A `GlobSetBuilder` can be used to add new
+         * patterns. Once all patterns have been added, `build` should be called
+         * to produce a [GlobSet], which can then be used for matching.
+         */
         fun new(): GlobSetBuilder = GlobSetBuilder()
 
         /** Default GlobSetBuilder. */
         fun default(): GlobSetBuilder = new()
     }
 
-    /** Add a pattern to this builder. */
+    /** Add a new pattern to this set. */
     fun add(pat: Glob): GlobSetBuilder {
         pats.add(pat)
         return this
