@@ -693,6 +693,13 @@ internal sealed class Token {
     data class Alternates(
         val patterns: List<Tokens>,
     ) : Token()
+
+    companion object {
+        fun `class`(s: Char, e: Char): Token = CharClass(false, listOf(s to e))
+        fun classn(s: Char, e: Char): Token = CharClass(true, listOf(s to e))
+        fun rclass(ranges: List<Pair<Char, Char>>): Token = CharClass(false, ranges)
+        fun rclassn(ranges: List<Pair<Char, Char>>): Token = CharClass(true, ranges)
+    }
 }
 
 private val REGEX_META_CHARS =
