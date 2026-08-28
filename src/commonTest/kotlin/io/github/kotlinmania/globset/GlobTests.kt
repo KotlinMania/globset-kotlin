@@ -874,4 +874,54 @@ class GlobTests {
         assertEquals("src/**/*.kt", g.asRef())
         assertEquals(g, Glob.new("src/**/*.kt"))
     }
+
+    @Test
+    fun compileStrategicMatcher() {
+        val glob = Glob.new("*.rs")
+        val strat = glob.compileStrategicMatcher()
+        assertTrue(strat.isMatch("main.rs"))
+        assertFalse(strat.isMatch("main.c"))
+    }
+
+    @Test
+    fun startsWith() {
+        assertTrue(startsWith("foo".encodeToByteArray(), "foobar".encodeToByteArray()))
+        assertFalse(startsWith("bar".encodeToByteArray(), "foobar".encodeToByteArray()))
+    }
+
+    @Test
+    fun endsWith() {
+        assertTrue(endsWith("bar".encodeToByteArray(), "foobar".encodeToByteArray()))
+        assertFalse(endsWith("foo".encodeToByteArray(), "foobar".encodeToByteArray()))
+    }
+
+    @Test
+    fun s() {
+        assertEquals("test", s("test"))
+    }
+
+    @Test
+    fun `class`() {
+        val tok = `class`('a', 'z')
+        assertEquals(Token.CharClass(negated = false, ranges = listOf(Pair('a', 'z'))), tok)
+    }
+
+    @Test
+    fun classn() {
+        val tok = classn('a', 'z')
+        assertEquals(Token.CharClass(negated = true, ranges = listOf(Pair('a', 'z'))), tok)
+    }
+
+    @Test
+    fun rclass() {
+        val tok = rclass(listOf(Pair('a', 'z'), Pair('0', '9')))
+        assertEquals(Token.CharClass(negated = false, ranges = listOf(Pair('a', 'z'), Pair('0', '9'))), tok)
+    }
+
+    @Test
+    fun rclassn() {
+        val tok = rclassn(listOf(Pair('a', 'z'), Pair('0', '9')))
+        assertEquals(Token.CharClass(negated = true, ranges = listOf(Pair('a', 'z'), Pair('0', '9'))), tok)
+    }
 }
+
