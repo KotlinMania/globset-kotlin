@@ -1,4 +1,4 @@
-// port-lint: source globset/src/lib.rs
+// port-lint: source lib.rs
 package io.github.kotlinmania.globset
 
 /**
@@ -571,8 +571,6 @@ internal class RequiredExtensionStrategy(
         }
     }
 }
-
-internal typealias PatternSetPoolFn = () -> Set<Int>
 
 internal class RegexSetStrategy(
     val regexes: List<Pair<Int, Regex>>,
