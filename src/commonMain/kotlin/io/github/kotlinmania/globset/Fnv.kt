@@ -1,4 +1,4 @@
-// port-lint: source globset/src/fnv.rs
+// port-lint: source fnv.rs
 package io.github.kotlinmania.globset
 
 /** A convenience alias for creating a hash map with an FNV hasher. */

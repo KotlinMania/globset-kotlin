@@ -1,4 +1,4 @@
-// port-lint: tests globset/src/serde_impl.rs
+// port-lint: tests serde_impl.rs
 package io.github.kotlinmania.globset
 
 import kotlinx.serialization.builtins.MapSerializer

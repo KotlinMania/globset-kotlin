@@ -1,9 +1,7 @@
-// port-lint: source globset/src/lib.rs
+// port-lint: source lib.rs
 package io.github.kotlinmania.globset
 
 /**
- * Cross-platform single glob and glob set evaluation engine.
- *
  * Represents an error that can occur when parsing a glob pattern.
  */
 data class Error(
