@@ -1,4 +1,4 @@
-// port-lint: source lib.rs
+// port-lint: source globset/src/lib.rs
 package io.github.kotlinmania.globset
 
 /**
@@ -131,8 +131,8 @@ class Candidate internal constructor(
          */
         fun fromBytes(path: ByteArray): Candidate {
             val normalized = normalizePath(path)
-            val basename = fileName(normalized) ?: EMPTY
-            val ext = fileNameExt(basename) ?: EMPTY
+            val basename = fileName(normalized) ?: EMPTY_BYTES
+            val ext = fileNameExt(basename) ?: EMPTY_BYTES
             return Candidate(normalized, basename, ext)
         }
 
@@ -141,7 +141,7 @@ class Candidate internal constructor(
          */
         fun fromCow(path: ByteArray): Candidate = fromBytes(path)
 
-        private val EMPTY = ByteArray(0)
+        private val EMPTY_BYTES = ByteArray(0)
     }
 
     internal val pathString: String get() = path.decodeToString()
