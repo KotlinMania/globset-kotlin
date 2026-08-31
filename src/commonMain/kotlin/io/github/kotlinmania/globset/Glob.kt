@@ -113,6 +113,9 @@ class Glob internal constructor(
     internal val tokens: Tokens,
 ) {
     companion object {
+        typealias Err = Error
+        typealias Target = String
+
         /**
          * Builds a new pattern with default options.
          */

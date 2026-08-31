@@ -572,6 +572,8 @@ internal class RequiredExtensionStrategy(
     }
 }
 
+internal typealias PatternSetPoolFn = () -> List<Regex>
+
 internal class RegexSetStrategy(
     val regexes: List<Pair<Int, Regex>>,
 ) : GlobSetMatchStrategy {
