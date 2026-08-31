@@ -1,4 +1,4 @@
-// port-lint: source glob.rs
+// port-lint: source globset/src/glob.rs
 package io.github.kotlinmania.globset
 
 public typealias Err = Error
