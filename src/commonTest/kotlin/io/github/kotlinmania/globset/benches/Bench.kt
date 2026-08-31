@@ -1,4 +1,4 @@
-// port-lint: source benches/bench.rs
+// port-lint: source globset/benches/bench.rs
 package io.github.kotlinmania.globset.benches
 
 import io.github.kotlinmania.globset.Candidate
