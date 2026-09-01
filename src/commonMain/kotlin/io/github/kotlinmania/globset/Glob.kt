@@ -696,8 +696,11 @@ internal sealed class Token {
 
     companion object {
         fun `class`(s: Char, e: Char): Token = CharClass(false, listOf(s to e))
+
         fun classn(s: Char, e: Char): Token = CharClass(true, listOf(s to e))
+
         fun rclass(ranges: List<Pair<Char, Char>>): Token = CharClass(false, ranges)
+
         fun rclassn(ranges: List<Pair<Char, Char>>): Token = CharClass(true, ranges)
     }
 }
@@ -997,9 +1000,7 @@ private class Parser(
 
 private fun isPathSeparator(c: Char): Boolean = c == '/' || c == '\\'
 
-internal fun startsWith(needle: ByteArray, haystack: ByteArray): Boolean {
-    return needle.size <= haystack.size && needle.contentEquals(haystack.copyOfRange(0, needle.size))
-}
+internal fun startsWith(needle: ByteArray, haystack: ByteArray): Boolean = needle.size <= haystack.size && needle.contentEquals(haystack.copyOfRange(0, needle.size))
 
 internal fun endsWith(needle: ByteArray, haystack: ByteArray): Boolean {
     if (needle.size > haystack.size) {
@@ -1008,37 +1009,26 @@ internal fun endsWith(needle: ByteArray, haystack: ByteArray): Boolean {
     return needle.contentEquals(haystack.copyOfRange(haystack.size - needle.size, haystack.size))
 }
 
-internal fun s(string: String): String {
-    return string
-}
+internal fun s(string: String): String = string
 
-internal fun `class`(s: Char, e: Char): Token {
-    return Token.CharClass(negated = false, ranges = listOf(Pair(s, e)))
-}
+internal fun `class`(s: Char, e: Char): Token = Token.CharClass(negated = false, ranges = listOf(Pair(s, e)))
 
 internal fun classTok(s: Char, e: Char): Token = `class`(s, e)
 
-internal fun classn(s: Char, e: Char): Token {
-    return Token.CharClass(negated = true, ranges = listOf(Pair(s, e)))
-}
+internal fun classn(s: Char, e: Char): Token = Token.CharClass(negated = true, ranges = listOf(Pair(s, e)))
 
 internal fun classnTok(s: Char, e: Char): Token = classn(s, e)
 
-internal fun rclass(ranges: List<Pair<Char, Char>>): Token {
-    return Token.CharClass(negated = false, ranges = ranges)
-}
+internal fun rclass(ranges: List<Pair<Char, Char>>): Token = Token.CharClass(negated = false, ranges = ranges)
 
 internal fun rclass(vararg ranges: Pair<Char, Char>): Token =
     Token.CharClass(negated = false, ranges = ranges.toList())
 
 internal fun rclassTok(ranges: List<Pair<Char, Char>>): Token = rclass(ranges)
 
-internal fun rclassn(ranges: List<Pair<Char, Char>>): Token {
-    return Token.CharClass(negated = true, ranges = ranges)
-}
+internal fun rclassn(ranges: List<Pair<Char, Char>>): Token = Token.CharClass(negated = true, ranges = ranges)
 
 internal fun rclassn(vararg ranges: Pair<Char, Char>): Token =
     Token.CharClass(negated = true, ranges = ranges.toList())
 
 internal fun rclassnTok(ranges: List<Pair<Char, Char>>): Token = rclassn(ranges)
-
