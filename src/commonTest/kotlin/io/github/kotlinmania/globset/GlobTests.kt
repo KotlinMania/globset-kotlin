@@ -924,4 +924,3 @@ class GlobTests {
         assertEquals(Token.CharClass(negated = true, ranges = listOf(Pair('a', 'z'), Pair('0', '9'))), tok)
     }
 }
-
