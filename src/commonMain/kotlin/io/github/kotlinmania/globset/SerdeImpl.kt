@@ -1,4 +1,5 @@
-// port-lint: source serde_impl.rs
+@file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
+
 package io.github.kotlinmania.globset
 
 import kotlinx.serialization.KSerializer
@@ -9,6 +10,8 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlin.experimental.ExperimentalObjCRefinement
+import kotlin.native.HiddenFromObjC
 
 internal object GlobVisitor {
     typealias Value = Glob
@@ -32,6 +35,7 @@ internal object GlobSetVisitor {
     }
 }
 
+@HiddenFromObjC
 object GlobSerializer : KSerializer<Glob> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("Glob", PrimitiveKind.STRING)
@@ -46,6 +50,7 @@ object GlobSerializer : KSerializer<Glob> {
     }
 }
 
+@HiddenFromObjC
 object GlobSetSerializer : KSerializer<GlobSet> {
     private val delegate = ListSerializer(String.serializer())
     override val descriptor: SerialDescriptor = delegate.descriptor
