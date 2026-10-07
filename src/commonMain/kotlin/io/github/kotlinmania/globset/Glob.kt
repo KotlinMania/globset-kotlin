@@ -200,9 +200,9 @@ class Glob internal constructor(
             else -> return null
         }
         if (tokens.size <= start + 1) return null
-        when (val dotTok = tokens[start + 1]) {
-            is Token.Literal -> if (dotTok.char != '.') return null
-            else -> return null
+        val dotTok = tokens[start + 1]
+        if (dotTok !is Token.Literal || dotTok.char != '.') {
+            return null
         }
         val lit = StringBuilder(".")
         for (i in start + 2 until tokens.size) {
