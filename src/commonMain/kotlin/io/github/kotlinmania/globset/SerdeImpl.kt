@@ -1,3 +1,4 @@
+// port-lint: source serde_impl.rs
 @file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
 
 package io.github.kotlinmania.globset
