@@ -252,7 +252,7 @@ class Glob internal constructor(
         }
         if (tokens.isEmpty()) return null
         val (end, needSep) =
-            when (val last = tokens.last()) {
+            when (tokens.last()) {
                 is Token.ZeroOrMore -> {
                     if (opts.literalSeparator) {
                         return null
