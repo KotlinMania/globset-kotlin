@@ -1,6 +1,11 @@
 // port-lint: source glob.rs
 package io.github.kotlinmania.globset
 
+import io.github.kotlinmania.serde.SerdeResult
+import io.github.kotlinmania.serdecore.de.Deserialize
+import io.github.kotlinmania.serdecore.ser.Serialize
+import io.github.kotlinmania.serdecore.ser.Serializer
+
 /**
  * Describes a matching strategy for a particular pattern.
  *
@@ -111,8 +116,11 @@ class Glob internal constructor(
     private val re: String,
     private val opts: GlobOptions,
     internal val tokens: Tokens,
-) {
-    companion object {
+) : Serialize {
+    override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
+        serializer.serializeStr(glob())
+
+    companion object : Deserialize<Glob> by GlobDeserialize {
         typealias Err = Error
         typealias Target = String
 

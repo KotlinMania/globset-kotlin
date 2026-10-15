@@ -3,6 +3,12 @@
 
 package io.github.kotlinmania.globset
 
+import io.github.kotlinmania.serde.SerdeError
+import io.github.kotlinmania.serde.SerdeResult
+import io.github.kotlinmania.serdecore.de.Deserialize
+import io.github.kotlinmania.serdecore.de.Deserializer
+import io.github.kotlinmania.serdecore.de.SeqAccess
+import io.github.kotlinmania.serdecore.de.Visitor
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
@@ -14,26 +20,48 @@ import kotlinx.serialization.encoding.Encoder
 import kotlin.experimental.ExperimentalObjCRefinement
 import kotlin.native.HiddenFromObjC
 
-internal object GlobVisitor {
-    typealias Value = Glob
+internal object GlobVisitor : Visitor<Glob> {
+    override fun expecting(): String = "a glob pattern"
 
-    fun expecting(): String = "a glob pattern"
-
-    fun visitStr(v: String): Glob = Glob.new(v)
+    override fun visitStr(v: String): SerdeResult<Glob> =
+        try {
+            SerdeResult.success(Glob.new(v))
+        } catch (e: Exception) {
+            SerdeResult.failure(SerdeError.custom(e.message ?: "invalid glob pattern"))
+        }
 }
 
-internal object GlobSetVisitor {
-    typealias Value = GlobSet
+data object GlobDeserialize : Deserialize<Glob> {
+    override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<Glob> =
+        deserializer.deserializeStr(GlobVisitor)
+}
 
-    fun expecting(): String = "an array of glob patterns"
+internal object GlobSetVisitor : Visitor<GlobSet> {
+    override fun expecting(): String = "an array of glob patterns"
 
-    fun visitSeq(seq: List<Glob>): GlobSet {
+    override fun <A> visitSeq(access: A): SerdeResult<GlobSet>
+        where A : SeqAccess {
         val builder = GlobSetBuilder.new()
-        for (glob in seq) {
-            builder.add(glob)
+        while (true) {
+            when (val next = access.nextElement(GlobDeserialize)) {
+                is SerdeResult.Failure -> return SerdeResult.failure(next.error)
+                is SerdeResult.Success -> {
+                    val glob = next.value ?: break
+                    builder.add(glob)
+                }
+            }
         }
-        return builder.build()
+        return try {
+            SerdeResult.success(builder.build())
+        } catch (e: Exception) {
+            SerdeResult.failure(SerdeError.custom(e.message ?: "invalid glob set"))
+        }
     }
+}
+
+data object GlobSetDeserialize : Deserialize<GlobSet> {
+    override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<GlobSet> =
+        deserializer.deserializeSeq(GlobSetVisitor)
 }
 
 @HiddenFromObjC
@@ -47,7 +75,7 @@ object GlobSerializer : KSerializer<Glob> {
 
     override fun deserialize(decoder: Decoder): Glob {
         val str = decoder.decodeString()
-        return GlobVisitor.visitStr(str)
+        return Glob.new(str)
     }
 }
 
@@ -62,6 +90,10 @@ object GlobSetSerializer : KSerializer<GlobSet> {
     override fun deserialize(decoder: Decoder): GlobSet {
         val list = delegate.deserialize(decoder)
         val globs = list.map { Glob.new(it) }
-        return GlobSetVisitor.visitSeq(globs)
+        val builder = GlobSetBuilder.new()
+        for (glob in globs) {
+            builder.add(glob)
+        }
+        return builder.build()
     }
 }

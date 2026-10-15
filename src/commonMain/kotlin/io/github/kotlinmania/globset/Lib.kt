@@ -1,6 +1,8 @@
 // port-lint: source lib.rs
 package io.github.kotlinmania.globset
 
+import io.github.kotlinmania.serdecore.de.Deserialize
+
 /**
  * Represents an error that can occur when parsing a glob pattern.
  */
@@ -199,7 +201,7 @@ class GlobSet internal constructor(
     internal val len: Int,
     internal val strats: List<GlobSetMatchStrategy>,
 ) {
-    companion object {
+    companion object : Deserialize<GlobSet> by GlobSetDeserialize {
         /** Create an empty GlobSet. An empty set matches nothing. */
         fun empty(): GlobSet = GlobSet(0, emptyList())
 
