@@ -1,6 +1,6 @@
 # port-lint Proposed Changes
 
-**Generated:** 2026-10-06
+**Generated:** 2026-10-18
 **Source:** tmp/globset/src
 **Target:** src/commonMain/kotlin/io/github/kotlinmania/globset
 
