@@ -3,6 +3,7 @@ package io.github.kotlinmania.globset
 
 import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serdecore.de.Deserialize
+import io.github.kotlinmania.serdecore.de.Deserializer
 import io.github.kotlinmania.serdecore.ser.Serialize
 import io.github.kotlinmania.serdecore.ser.Serializer
 
@@ -118,9 +119,11 @@ class Glob internal constructor(
     internal val tokens: Tokens,
 ) : Serialize {
     override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
-        serializer.serializeStr(glob())
+        serialize(this, serializer)
 
-    companion object : Deserialize<Glob> by GlobDeserialize {
+    companion object : Deserialize<Glob> {
+        override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<Glob> =
+            deserialize(this, deserializer)
         typealias Err = Error
         typealias Target = String
 

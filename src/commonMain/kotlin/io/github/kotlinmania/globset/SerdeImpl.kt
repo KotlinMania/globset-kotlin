@@ -1,24 +1,15 @@
 // port-lint: source serde_impl.rs
-@file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
-
 package io.github.kotlinmania.globset
 
 import io.github.kotlinmania.serde.SerdeError
 import io.github.kotlinmania.serde.SerdeResult
-import io.github.kotlinmania.serdecore.de.Deserialize
 import io.github.kotlinmania.serdecore.de.Deserializer
 import io.github.kotlinmania.serdecore.de.SeqAccess
 import io.github.kotlinmania.serdecore.de.Visitor
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import kotlin.experimental.ExperimentalObjCRefinement
-import kotlin.native.HiddenFromObjC
+import io.github.kotlinmania.serdecore.ser.Serializer
+
+fun <Ok> serialize(glob: Glob, serializer: Serializer<Ok>): SerdeResult<Ok> =
+    serializer.serializeStr(glob.glob())
 
 internal object GlobVisitor : Visitor<Glob> {
     override fun expecting(): String = "a glob pattern"
@@ -31,19 +22,16 @@ internal object GlobVisitor : Visitor<Glob> {
         }
 }
 
-data object GlobDeserialize : Deserialize<Glob> {
-    override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<Glob> =
-        deserializer.deserializeStr(GlobVisitor)
-}
+fun <D : Deserializer> deserialize(companion: Glob.Companion, deserializer: D): SerdeResult<Glob> =
+    deserializer.deserializeStr(GlobVisitor)
 
 internal object GlobSetVisitor : Visitor<GlobSet> {
     override fun expecting(): String = "an array of glob patterns"
 
-    override fun <A> visitSeq(access: A): SerdeResult<GlobSet>
-        where A : SeqAccess {
+    override fun <A : SeqAccess> visitSeq(access: A): SerdeResult<GlobSet> {
         val builder = GlobSetBuilder.new()
         while (true) {
-            when (val next = access.nextElement(GlobDeserialize)) {
+            when (val next = access.nextElement(Glob.Companion)) {
                 is SerdeResult.Failure -> return SerdeResult.failure(next.error)
                 is SerdeResult.Success -> {
                     val glob = next.value ?: break
@@ -59,41 +47,5 @@ internal object GlobSetVisitor : Visitor<GlobSet> {
     }
 }
 
-data object GlobSetDeserialize : Deserialize<GlobSet> {
-    override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<GlobSet> =
-        deserializer.deserializeSeq(GlobSetVisitor)
-}
-
-@HiddenFromObjC
-object GlobSerializer : KSerializer<Glob> {
-    override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("Glob", PrimitiveKind.STRING)
-
-    override fun serialize(encoder: Encoder, value: Glob) {
-        encoder.encodeString(value.glob())
-    }
-
-    override fun deserialize(decoder: Decoder): Glob {
-        val str = decoder.decodeString()
-        return Glob.new(str)
-    }
-}
-
-@HiddenFromObjC
-object GlobSetSerializer : KSerializer<GlobSet> {
-    private val delegate = ListSerializer(String.serializer())
-    override val descriptor: SerialDescriptor = delegate.descriptor
-
-    override fun serialize(encoder: Encoder, value: GlobSet): Unit =
-        throw UnsupportedOperationException("GlobSet serialization is not supported")
-
-    override fun deserialize(decoder: Decoder): GlobSet {
-        val list = delegate.deserialize(decoder)
-        val globs = list.map { Glob.new(it) }
-        val builder = GlobSetBuilder.new()
-        for (glob in globs) {
-            builder.add(glob)
-        }
-        return builder.build()
-    }
-}
+fun <D : Deserializer> deserialize(companion: GlobSet.Companion, deserializer: D): SerdeResult<GlobSet> =
+    deserializer.deserializeSeq(GlobSetVisitor)
