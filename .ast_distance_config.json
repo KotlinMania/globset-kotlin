@@ -7,7 +7,7 @@
     "lang": "rust"
   },
   "target": {
-    "path": "src/commonMain/kotlin/io/github/kotlinmania/globset",
+    "path": "src/common/commonMain/kotlin/io/github/kotlinmania/globset",
     "lang": "kotlin"
   },
   "checks": {
