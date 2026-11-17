@@ -16,11 +16,11 @@ For every Rust crate this repo owns (under `tmp/`), this file lists every **cros
 
 | package | module | inbound use sites | distinct caller crates | distinct caller repos | codex sites |
 |---|---|---:|---:|---:|---:|
-| `globset` | `globset` | 20 | 6 | 4 | 9 |
+| `globset` | `globset` | 23 | 8 | 5 | 9 |
 
 ## `globset`
 
-### Inbound symbols (6 distinct, 20 total `use` sites)
+### Inbound symbols (6 distinct, 23 total `use` sites)
 
 Sorted by codex demand, then total demand. The first symbols are the priority queue for porting `globset`.
 
@@ -48,16 +48,19 @@ Sorted by codex demand, then total demand. The first symbols are the priority qu
 - `ignore-kotlin/ignore` `src/gitignore.rs:9` — `use globset::GlobSetBuilder`
 - `ignore-kotlin/ignore` `src/types.rs:4` — `use globset::GlobSetBuilder`
 
-#### `globset::GlobMatcher` — 3 site(s) (1 codex, 2 other, 3 caller crates)
+#### `globset::GlobMatcher` — 4 site(s) (1 codex, 3 other, 4 caller crates)
 
 - ✅ `codex-kotlin/codex-protocol` `src/permissions.rs:10` — `use globset::GlobMatcher`
+- `hf-hub-kotlin/hf-hub` `src/buckets/sync.rs:25` — `use globset::GlobMatcher`
 - `insta-kotlin/insta` `src/glob.rs:4` — `use globset::GlobMatcher`
 - `starlark-kotlin/starlark_bin` `bin/suppression.rs:6` — `use globset::GlobMatcher`
+
+#### `globset::Glob` — 3 site(s) (0 codex, 3 other, 3 caller crates)
+
+- `hf-hub-kotlin/hf-hub` `src/buckets/sync.rs:25` — `use globset::Glob`
+- `hf-hub-kotlin/hfrs` `src/commands/repos/delete_files.rs:4` — `use globset::Glob`
+- `starlark-kotlin/starlark_bin` `bin/suppression.rs:4` — `use globset::Glob`
 
 #### `globset::Candidate` — 1 site(s) (0 codex, 1 other, 1 caller crates)
 
 - `ignore-kotlin/ignore` `src/gitignore.rs:9` — `use globset::Candidate`
-
-#### `globset::Glob` — 1 site(s) (0 codex, 1 other, 1 caller crates)
-
-- `starlark-kotlin/starlark_bin` `bin/suppression.rs:4` — `use globset::Glob`

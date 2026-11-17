@@ -22,7 +22,7 @@ Add the dependency to your `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("io.github.kotlinmania:globset-kotlin:0.1.2")
+    implementation("io.github.kotlinmania:globset-kotlin:0.1.4")
 }
 ```
 
@@ -30,7 +30,7 @@ Or in your `build.gradle`:
 
 ```groovy
 dependencies {
-    implementation 'io.github.kotlinmania:globset-kotlin:0.1.2'
+    implementation 'io.github.kotlinmania:globset-kotlin:0.1.4'
 }
 ```
 

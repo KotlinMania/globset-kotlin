@@ -5,6 +5,7 @@ import io.github.kotlinmania.serde.SerdeError
 import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serdecore.de.Deserializer
 import io.github.kotlinmania.serdecore.de.SeqAccess
+import io.github.kotlinmania.serdecore.de.SeqElement
 import io.github.kotlinmania.serdecore.de.Visitor
 import io.github.kotlinmania.serdecore.ser.Serializer
 
@@ -34,8 +35,10 @@ internal object GlobSetVisitor : Visitor<GlobSet> {
             when (val next = access.nextElement(Glob.Companion)) {
                 is SerdeResult.Failure -> return SerdeResult.failure(next.error)
                 is SerdeResult.Success -> {
-                    val glob = next.value ?: break
-                    builder.add(glob)
+                    when (val elem = next.value) {
+                        is SeqElement.Some -> builder.add(elem.value)
+                        SeqElement.None -> break
+                    }
                 }
             }
         }
