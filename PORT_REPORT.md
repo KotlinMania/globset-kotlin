@@ -1,4 +1,4 @@
-=== Deep Analysis: tmp/globset/src (rust) -> src/commonMain/kotlin (kotlin) ===
+=== Deep Analysis: tmp/globset/src (rust) -> src/common/commonMain/kotlin (kotlin) ===
 
 Scanning source codebase (rust)...
 Codebase: tmp/globset/src (rust)
@@ -7,7 +7,7 @@ Codebase: tmp/globset/src (rust)
   Most depended: glob (1 dependents)
 
 Scanning target codebase (kotlin)...
-Codebase: src/commonMain/kotlin (kotlin)
+Codebase: src/common/commonMain/kotlin (kotlin)
   Files: 10
   Total imports: 34
 
@@ -17,7 +17,7 @@ Computing AST similarities...
 === Codebase Comparison Report ===
 
 Source: tmp/globset/src (5 files)
-Target: src/commonMain/kotlin (10 files)
+Target: src/common/commonMain/kotlin (10 files)
 Scoring invariant: FnSim is required function body/parameter similarity. Class/type and symbol parity are reported beside it; whole-file shape is diagnostic only.
 
 Matched:   5 files
